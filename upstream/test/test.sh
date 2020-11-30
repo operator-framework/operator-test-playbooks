@@ -242,7 +242,7 @@ fi
 
 # Install prerequisites (kind cluster)
 [[ $OP_TEST_FORCE_INSTALL -eq 1 ]] && run echo -e " [ Installing prerequisites ] "
-[[ $OP_TEST_FORCE_INSTALL -eq 1 ]] && run $DRY_RUN_CMD ansible-pull -U $OP_TEST_ANSIBLE_PULL_REPO -C $OP_TEST_ANSIBLE_PULL_BRANCH $OP_TEST_ANSIBLE_DEFAULT_ARGS $OP_TEST_ANSIBLE_EXTRA_ARGS -e run_prepare_catalog_repo_upstream=false upstream/local.yml
+[[ $OP_TEST_FORCE_INSTALL -eq 1 ]] && run $DRY_RUN_CMD ansible-pull -U $OP_TEST_ANSIBLE_PULL_REPO -C $OP_TEST_ANSIBLE_PULL_BRANCH $OP_TEST_ANSIBLE_DEFAULT_ARGS $OP_TEST_ANSIBLE_EXTRA_ARGS -e run_prepare_catalog_repo_upstream=false
 
 if [ -n "$OP_TEST_REPO" ];then
     OP_TEST_EXEC_EXTRA="$OP_TEST_EXEC_EXTRA -e catalog_repo=$OP_TEST_REPO -e catalog_repo_branch=$OP_TEST_BRANCH"
