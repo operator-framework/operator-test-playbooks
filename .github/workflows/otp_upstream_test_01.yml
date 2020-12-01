@@ -1,0 +1,27 @@
+# This is a basic workflow to help you get started with Actions
+
+name: otpu_01
+env:
+  ANSIBLE_CONFIG: "$PWD/upstream/ansible.cfg"
+  ANSIBLE_BASE_ARGS: "-i localhost, local.yml -e ansible_connection=local -e run_upstream=true -e run_remove_catalog_repo=false"
+
+# Controls when the action will run.
+on: push
+  # Triggers the workflow on push or pull request events but only for the master branch
+  # push:
+    # branches: [ master ]
+  # pull_request:
+  #   branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Operator test
+        run: ansible-playbook $ANSIBLE_BASE_ARGS -e operator_dir=/tmp/community-operators-for-catalog/upstream-community-operators/aqua -e operator_version=1.0.2 --tags pure_test -e strict_mode=true
