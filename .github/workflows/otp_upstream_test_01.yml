@@ -3,15 +3,15 @@ env:
   ANSIBLE_CONFIG: "$PWD/upstream/ansible.cfg"
   ANSIBLE_BASE_ARGS: "-i localhost, upstream/local.yml -e ansible_connection=local -e run_upstream=true -e run_remove_catalog_repo=false"
 
-on: push
+on:
   # Triggers the workflow on push or pull request events but only for the master branch
-  # push:
-    # branches: [ master ]
-  # pull_request:
-  #   branches: [ master ]
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
   # Allows you to run this workflow manually from the Actions tab
-  # workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   otpu_bf:
