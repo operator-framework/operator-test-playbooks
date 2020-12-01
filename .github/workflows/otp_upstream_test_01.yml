@@ -15,6 +15,7 @@ on: push
 
 jobs:
   otpu_01:
+    name: Testing operator in bundle format
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -24,6 +25,7 @@ jobs:
       - name: Operator test
         run: ansible-playbook $ANSIBLE_BASE_ARGS -e operator_dir=/tmp/community-operators-for-catalog/upstream-community-operators/aqua -e operator_version=1.0.2 --tags pure_test -e strict_mode=true
   otpu_02:
+    name: Testing operator in manifest format, converting to bundle and bundle test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -32,3 +34,64 @@ jobs:
         run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
       - name: Operator test
         run: ansible-playbook $ANSIBLE_BASE_ARGS -e operator_dir=/tmp/community-operators-for-catalog/scripts/bundle-examples/prometheus -e operator_version=0.32.0 --tags pure_test -e strict_mode=true
+  otpu_03:
+    name: Testing operator in manifest format, converting to bundle and bundle test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Preparing operator test environment
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
+      - name: Operator test
+        run: ansible-playbook $ANSIBLE_BASE_ARGS -e operator_dir=/tmp/community-operators-for-catalog/upstream-community-operators/eclipse-che -e operator_version=7.14.2 -e operator_channel_force=stable --tags pure_test -e strict_mode=true
+  otpu_04:
+    name: Testing operator in manifest format, converting to bundle and bundle test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Preparing operator test environment
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
+      - name: Operator test
+        run: ansible-playbook $ANSIBLE_BASE_ARGS -e operator_dir=/tmp/community-operators-for-catalog/upstream-community-operators/jaeger -e operator_version=1.18.0 --tags pure_test -e strict_mode=true
+  otpu_05:
+    name: Testing operator in manifest format and manifest test only (Without conversion to bundle )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Preparing operator test environment
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
+      - name: Operator test
+        run: ansible-playbook $ANSIBLE_BASE_ARGS -e operator_dir=/tmp/community-operators-for-catalog/upstream-community-operators/aqua -e operator_version=1.0.2 --tags pure_test -e run_bundle_test=false -e run_manifest_test=true -e strict_mode=true
+  otpu_06:
+    name: Deploying of multiple operators to bundle index test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Preparing operator test environment
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
+      - name: Operator test
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags deploy_bundles -e operators_config=upstream/test/operators_config.yaml
+  otpu_07:
+    name: Deploying of multiple operators to bundle index test with checking prod registry first for bundle image. Local catalog index is rebuilded
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Preparing operator test environment
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
+      - name: Operator test
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags deploy_bundles -e operators_config=upstream/test/operators_config.yaml -e production_registry_namespace="quay.io/operatorhubio" -e index_force_update=true
+
+  otpu_08:
+    name: Deploying of multiple operators to bundle index test (multiple cluster versions)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Preparing operator test environment
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
+      - name: Operator test
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags deploy_bundles -e operators_config=upstream/test/operators_config.yaml -e use_cluster_filter=true
