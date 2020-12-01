@@ -3,7 +3,7 @@
 name: otpu_01
 env:
   ANSIBLE_CONFIG: "$PWD/upstream/ansible.cfg"
-  ANSIBLE_BASE_ARGS: "-i localhost, upstream/local.yml -e ansible_connection=local -e run_upstream=true -e run_remove_catalog_repo=false"
+  ANSIBLE_BASE_ARGS: "-i localhost, upstream/local.yml -e ansible_connection=local -e run_upstream=true -e run_remove_catalog_repo=false -e yq_bin_path=/snap/bin/yq"
 
 # Controls when the action will run.
 on: push
@@ -20,7 +20,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Install xmllint
+      - name: Install yq
         run: sudo snap install yq
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
