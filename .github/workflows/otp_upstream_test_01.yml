@@ -44,8 +44,8 @@ jobs:
         run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
       - name: Operator test
         run: ansible-playbook $ANSIBLE_BASE_ARGS -e operator_dir=/tmp/community-operators-for-catalog/upstream-community-operators/aqua -e operator_version=1.0.2 --tags pure_test -e run_bundle_test=false -e run_manifest_test=true -e strict_mode=true
-  otpu_dmotbifs:
-    name: Deploy multiple operators to bundle index from scratch
+  otpu_ifs:
+    name: Index from scratch
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -53,9 +53,9 @@ jobs:
       - name: Preparing operator test environment
         run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
       - name: Operator test
-        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags deploy_bundles -e operators_config=upstream/test/operators_config.yaml
-  otpu_dmotbifp:
-    name: Deploy multiple operators to bundle index from production
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags deploy_bundles -e operators_config=test/operators_config.yaml
+  otpu_ifp:
+    name: Index from production
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -63,9 +63,9 @@ jobs:
       - name: Preparing operator test environment
         run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
       - name: Operator test
-        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags deploy_bundles -e operators_config=upstream/test/operators_config.yaml -e production_registry_namespace="quay.io/operatorhubio" -e index_force_update=true
-  otpu_dmotbifsmcv:
-    name: Deploying of multiple operators to bundle index test (multiple cluster versions)
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags deploy_bundles -e operators_config=test/operators_config.yaml -e production_registry_namespace="quay.io/operatorhubio" -e index_force_update=true
+  otpu_ifsmv:
+    name: Index from scratch (multiple versions)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -73,4 +73,4 @@ jobs:
       - name: Preparing operator test environment
         run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
       - name: Operator test
-        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags deploy_bundles -e operators_config=upstream/test/operators_config.yaml -e use_cluster_filter=true
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags deploy_bundles -e operators_config=test/operators_config.yaml -e use_cluster_filter=true
