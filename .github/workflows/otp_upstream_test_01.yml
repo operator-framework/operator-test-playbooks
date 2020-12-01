@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install setuptools
-        run: sudo apt install python-setuptools
+        run: sudo apt-get install python3-setuptools
       - name: Install yq
         run: pip3 install yq
       # Checks out a copy of your repository on the ubuntu-latest machine
