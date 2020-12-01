@@ -1,11 +1,8 @@
-# This is a basic workflow to help you get started with Actions
-
-name: otpu_01
+name: otpu
 env:
   ANSIBLE_CONFIG: "$PWD/upstream/ansible.cfg"
   ANSIBLE_BASE_ARGS: "-i localhost, upstream/local.yml -e ansible_connection=local -e run_upstream=true -e run_remove_catalog_repo=false"
 
-# Controls when the action will run.
 on: push
   # Triggers the workflow on push or pull request events but only for the master branch
   # push:
@@ -17,17 +14,21 @@ on: push
   # workflow_dispatch:
 
 jobs:
-  test:
+  otpu_01:
     runs-on: ubuntu-latest
     steps:
-      # - name: Install setuptools
-      #   run: sudo apt-get install python3-setuptools
-      # - name: Install yq
-      #   run: pip3 install toml yq jq
-      # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Preparing operator test environment
         run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
       - name: Operator test
         run: ansible-playbook $ANSIBLE_BASE_ARGS -e operator_dir=/tmp/community-operators-for-catalog/upstream-community-operators/aqua -e operator_version=1.0.2 --tags pure_test -e strict_mode=true
+  otpu_02:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Preparing operator test environment
+        run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
+      - name: Operator test
+        run: ansible-playbook $ANSIBLE_BASE_ARGS -e operator_dir=/tmp/community-operators-for-catalog/scripts/bundle-examples/prometheus -e operator_version=0.32.0 --tags pure_test -e strict_mode=true
