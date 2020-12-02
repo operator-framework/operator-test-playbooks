@@ -135,8 +135,8 @@ if [ -n "$OP_TEST_LABELS" ];then
     [[ "$l" = "allow/operator-version-overwrite" ]] && export OP_TEST_VER_OVERWRITE=1
     [[ "$l" = "allow/operator-recreate" ]] && export OP_TEST_RECREATE=1
     [[ "$l" = "test/force-deploy-on-kubernetes" ]] && export OP_TEST_FORCE_DEPLOY_ON_K8S=1
-    [[ "$l" = "verbosity/high" ]] && export OP_TEST_DEBUG=1
-    [[ "$l" = "verbosity/debug" ]] && export OP_TEST_DEBUG=2
+    [[ "$l" = "verbosity/high" ]] && export OP_TEST_DEBUG=2
+    [[ "$l" = "verbosity/debug" ]] && export OP_TEST_DEBUG=3
     done
 else
     echo "Info: No labels defined"
@@ -147,6 +147,7 @@ fi
 [[ $OP_TEST_DEBUG -eq 3 ]] && OP_TEST_EXEC_EXTRA="-vv $OP_TEST_EXEC_EXTRA"
 [[ $OP_TEST_DRY_RUN -eq 1 ]] && DRY_RUN_CMD="echo"
 
+echo "debug=$OP_TEST_DEBUG"
 
 # Handle test types
 [ -z $1 ] && help
@@ -294,6 +295,7 @@ for t in $TESTS;do
     # Exec test
     OP_TEST_EXEC_USER=
     [ "$t" = "kiwi" ] && OP_TEST_EXEC_USER="-e operator_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR -e operator_version=$OP_TEST_VERSION --tags pure_test"
+    [ "$t" = "kiwi" ] && [ "$OP_TEST_STREAM" = "community-operators" ] && [[ $OP_TEST_FORCE_DEPLOY_ON_K8S -eq 0 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e test_skip_deploy=true"
     [ "$t" = "lemon" ] && OP_TEST_EXEC_USER="-e operator_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR --tags deploy_bundles"
     [ "$t" = "orange" ] && OP_TEST_EXEC_USER="-e operator_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR $PROD_REGISTRY_ARGS --tags deploy_bundles"
 
