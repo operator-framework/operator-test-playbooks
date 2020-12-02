@@ -128,6 +128,9 @@ if [ "$OP_TEST_CONTAINER_TOOL" = "podman" ];then
     OP_TEST_EXEC_EXTRA="$OP_TEST_EXEC_EXTRA -e opm_container_tool=podman -e container_tool=podman -e opm_container_tool_index="
 fi
 
+[ -d $OP_TEST_LOG_DIR ] || mkdir -p $OP_TEST_LOG_DIR
+[ -f $OP_TEST_LOG_DIR/log.out ] && rm -f $OP_TEST_LOG_DIR/log.out
+
 # Handle labels
 if [ -n "$OP_TEST_LABELS" ];then
     for l in $(echo $OP_TEST_LABELS);do
@@ -272,9 +275,6 @@ if ! $DRY_RUN_CMD command -v kind > /dev/null 2>&1; then
 #         echo
 #     fi
 fi
-
-[ -d $OP_TEST_LOG_DIR ] || mkdir -p $OP_TEST_LOG_DIR
-[ -f $OP_TEST_LOG_DIR/log.out ] && rm -f $OP_TEST_LOG_DIR/log.out
 
 # Install prerequisites (kind cluster)
 [[ $OP_TEST_FORCE_INSTALL -eq 1 ]] && run echo -e " [ Installing prerequisites ] "
