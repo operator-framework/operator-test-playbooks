@@ -101,7 +101,7 @@
       set_fact:
         opm_container_tool: "podman"
         opm_container_tool_index: ""
-        container_push_extra: "--format=docker"
+        container_push_extra: "--format=v2s1"
       when: container_tool == "podman"
       tags:
         - always
