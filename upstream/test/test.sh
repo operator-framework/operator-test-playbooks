@@ -368,9 +368,7 @@ for t in $TESTS;do
     if [[ $1 == orange* ]] && [[ $OP_TEST_PROD -ge 1 ]] && [ "$OP_TEST_VERSION" = "sync" ];then
         echo "$OP_TEST_EXEC_BASE $OP_TEST_EXEC_EXTRA --tags index_check $OP_TEST_EXEC_USER_INDEX_CHECK"
         run $DRY_RUN_CMD $OP_TEST_CONTAINER_TOOL exec $OP_TEST_CONTAINER_OPT $OP_TEST_NAME /bin/bash -c "update-ca-trust && $OP_TEST_EXEC_BASE $OP_TEST_EXEC_EXTRA --tags index_check $OP_TEST_EXEC_USER_INDEX_CHECK"
-        set +e
-        $DRY_RUN_CMD $OP_TEST_CONTAINER_TOOL exec $OP_TEST_CONTAINER_OPT $OP_TEST_NAME /bin/bash -c "ls $OP_TEST_UNCOMPLETE" || continue
-        set -e
+        $DRY_RUN_CMD $OP_TEST_CONTAINER_TOOL exec $OP_TEST_CONTAINER_OPT $OP_TEST_NAME /bin/bash -c "ls $OP_TEST_UNCOMPLETE" > /dev/null 2>&1 || continue
         OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e operators_config=$OP_TEST_UNCOMPLETE"
     fi
     echo "$OP_TEST_EXEC_BASE $OP_TEST_EXEC_EXTRA $OP_TEST_EXEC_USER"
