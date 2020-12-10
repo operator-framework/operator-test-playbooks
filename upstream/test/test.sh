@@ -261,11 +261,13 @@ function ExecParameters() {
     [[ $OP_TEST_VER_OVERWRITE -eq 1 ]] && [ -z $OP_TEST_VERSION ] && { echo "Warning: OP_TEST_VER_OVERWRITE=1 and no version specified 'OP_TEST_VERSION=$OP_TEST_VERSION' !!! Skipping ..."; OP_TEST_SKIP=1; }
 
 
-    # Handle index_check
-    [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER_INDEX_CHECK="-e run_prepare_catalog_repo_upstream=false -e bundle_registry=quay.io -e bundle_index_image_namespace=openshift-community-operators -e bundle_index_image_name=catalog -e operator_base_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM"
-    [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER_INDEX_CHECK="-e run_prepare_catalog_repo_upstream=false -e bundle_registry=quay.io -e bundle_image_namespace=operatorhubio -e bundle_index_image_name=catalog -e operator_base_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM"
+    [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER_INDEX_CHECK="-e run_prepare_catalog_repo_upstream=true -e bundle_index_image=quay.io/operatorhubio/catalog:latest -e operator_base_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM"
 
-    [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER_INDEX_CHECK="$OP_TEST_EXEC_USER_INDEX_CHECK -e bundle_index_image_version=${1/orange_/}"
+    # Handle index_check
+    # [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER_INDEX_CHECK="-e run_prepare_catalog_repo_upstream=false -e bundle_registry=quay.io -e bundle_index_image_namespace=openshift-community-operators -e bundle_index_image_name=catalog -e operator_base_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM"
+    # [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER_INDEX_CHECK="-e run_prepare_catalog_repo_upstream=false -e bundle_registry=quay.io -e bundle_image_namespace=operatorhubio -e bundle_index_image_name=catalog -e operator_base_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM"
+
+    # [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER_INDEX_CHECK="$OP_TEST_EXEC_USER_INDEX_CHECK -e bundle_index_image_version=${1/orange_/}"
 
     # Handle OP_TEST_VER_OVERWRITE
     [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e fail_on_no_index_change=true"
