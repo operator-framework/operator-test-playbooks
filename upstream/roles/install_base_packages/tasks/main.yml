@@ -3,6 +3,7 @@
   package:
     name:
       - curl
+      - findutils
       - openssl
       - screen
       - ca-certificates
