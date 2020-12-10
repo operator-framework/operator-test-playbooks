@@ -26,7 +26,7 @@ OP_TEST_CONTAINER_RUN_EXTRA_ARGS=${OP_TEST_CONTAINER_RUN_EXTRA_ARGS-""}
 OP_TEST_CONTAINER_EXEC_DEFAULT_ARGS=${OP_TEST_CONTAINER_EXEC_DEFAULT_ARGS-""}
 OP_TEST_CONTAINER_EXEC_EXTRA_ARGS=${OP_TEST_CONTAINER_EXEC_EXTRA_ARGS-""}
 OP_TEST_EXEC_BASE=${OP_TEST_EXEC_BASE-"ansible-playbook -i localhost, -e ansible_connection=local upstream/local.yml -e run_upstream=true -e image_protocol='docker://'"}
-OP_TEST_EXEC_EXTRA=${OP_TEST_EXEC_EXTRA-"-e opm_container_tool=podman -e container_tool=podman -e opm_container_tool_index=podman"}
+OP_TEST_EXEC_EXTRA=${OP_TEST_EXEC_EXTRA-"-e opm_container_tool=podman -e container_tool=podman -e opm_container_tool_index=none"}
 # OP_TEST_EXEC_EXTRA=${OP_TEST_EXEC_EXTRA-""}
 OP_TEST_RUN_MODE=${OP_TEST_RUN_MODE-"privileged"}
 OP_TEST_LABELS=${OP_TEST_LABELS-""}
@@ -108,8 +108,8 @@ run() {
         fi
 }
 
-[ "$OP_TEST_RUN_MODE" = "privileged" ] && OP_TEST_CONAINER_RUN_DEFAULT_ARGS="--privileged --net host -v $OP_TEST_CERT_DIR:/usr/share/pki/ca-trust-source/anchors -e STORAGE_DRIVER=vfs"
-[ "$OP_TEST_RUN_MODE" = "user" ] && OP_TEST_CONAINER_RUN_DEFAULT_ARGS="--net host -v $OP_TEST_CERT_DIR:/usr/share/pki/ca-trust-source/anchors -e STORAGE_DRIVER=vfs"
+[ "$OP_TEST_RUN_MODE" = "privileged" ] && OP_TEST_CONAINER_RUN_DEFAULT_ARGS="--privileged --net host -v $OP_TEST_CERT_DIR:/usr/share/pki/ca-trust-source/anchors -e STORAGE_DRIVER=vfs -e BUILDAH_FORMAT=docker"
+[ "$OP_TEST_RUN_MODE" = "user" ] && OP_TEST_CONAINER_RUN_DEFAULT_ARGS="--net host -v $OP_TEST_CERT_DIR:/usr/share/pki/ca-trust-source/anchors -e STORAGE_DRIVER=vfs -e BUILDAH_FORMAT=docker"
 
 # OP_TEST_EXEC_USER="-e operator_dir=/tmp/community-operators-for-catalog/upstream-community-operators/aqua -e operator_version=1.0.2 --tags pure_test"
 
@@ -126,7 +126,7 @@ if ! command -v ansible > /dev/null 2>&1; then
 fi
 
 if [ "$OP_TEST_CONTAINER_TOOL" = "podman" ];then
-    OP_TEST_ANSIBLE_EXTRA_ARGS="$OP_TEST_ANSIBLE_EXTRA_ARGS -e opm_container_tool=podman -e container_tool=podman -e opm_container_tool_index="
+    OP_TEST_ANSIBLE_EXTRA_ARGS="$OP_TEST_ANSIBLE_EXTRA_ARGS -e opm_container_tool=podman -e container_tool=podman -e opm_container_tool_index=none"
     # OP_TEST_EXEC_EXTRA="$OP_TEST_EXEC_EXTRA -e opm_container_tool=podman -e container_tool=podman -e opm_container_tool_index="
 fi
 
