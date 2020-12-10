@@ -293,7 +293,7 @@ function ExecParameters() {
     #"-e mirror_index_images=quay.io/redhat/redhat----community-operator-index|redhat+iib_community|$QUAY_RH_INDEX_PW"
 }
 
-echo "Using $(ansible --version | head -n 1) ..."
+echo "Using $(ansible --version | head -n 1) on host ..."
 if [[ $OP_TEST_DEBUG -ge 2 ]];then
     run echo "OP_TEST_DEBUG='$OP_TEST_DEBUG'"
     run echo "OP_TEST_DRY_RUN='$OP_TEST_DRY_RUN'"
