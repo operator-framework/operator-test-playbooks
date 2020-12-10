@@ -26,8 +26,8 @@ OP_TEST_CONTAINER_RUN_EXTRA_ARGS=${OP_TEST_CONTAINER_RUN_EXTRA_ARGS-""}
 OP_TEST_CONTAINER_EXEC_DEFAULT_ARGS=${OP_TEST_CONTAINER_EXEC_DEFAULT_ARGS-""}
 OP_TEST_CONTAINER_EXEC_EXTRA_ARGS=${OP_TEST_CONTAINER_EXEC_EXTRA_ARGS-""}
 OP_TEST_EXEC_BASE=${OP_TEST_EXEC_BASE-"ansible-playbook -i localhost, -e ansible_connection=local upstream/local.yml -e run_upstream=true -e image_protocol='docker://'"}
-# OP_TEST_EXEC_EXTRA=${OP_TEST_EXEC_EXTRA-"-e opm_container_tool=podman -e container_tool=podman -e opm_container_tool_index="}
-OP_TEST_EXEC_EXTRA=${OP_TEST_EXEC_EXTRA-""}
+OP_TEST_EXEC_EXTRA=${OP_TEST_EXEC_EXTRA-"-e opm_container_tool=podman -e container_tool=podman -e opm_container_tool_index="}
+# OP_TEST_EXEC_EXTRA=${OP_TEST_EXEC_EXTRA-""}
 OP_TEST_RUN_MODE=${OP_TEST_RUN_MODE-"privileged"}
 OP_TEST_LABELS=${OP_TEST_LABELS-""}
 OP_TEST_PROD=${OP_TEST_PROD-0}
@@ -127,7 +127,7 @@ fi
 
 if [ "$OP_TEST_CONTAINER_TOOL" = "podman" ];then
     OP_TEST_ANSIBLE_EXTRA_ARGS="$OP_TEST_ANSIBLE_EXTRA_ARGS -e opm_container_tool=podman -e container_tool=podman -e opm_container_tool_index="
-    OP_TEST_EXEC_EXTRA="$OP_TEST_EXEC_EXTRA -e opm_container_tool=podman -e container_tool=podman -e opm_container_tool_index="
+    # OP_TEST_EXEC_EXTRA="$OP_TEST_EXEC_EXTRA -e opm_container_tool=podman -e container_tool=podman -e opm_container_tool_index="
 fi
 
 [ -d $OP_TEST_LOG_DIR ] || mkdir -p $OP_TEST_LOG_DIR
@@ -243,7 +243,7 @@ function ExecParameters() {
     [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e quay_api_token=$QUAY_API_TOKEN_OPERATORHUBIO -e bundle_registry=quay.io -e bundle_image_namespace=operatorhubio -e bundle_index_image_namespace=operatorhubio -e bundle_index_image_name=catalog"
 
     # Only for testing use case
-    [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 2 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e quay_api_token=$QUAY_API_TOKEN_OPENSHIFT_COMMUNITY_OP -e bundle_registry=quay.io -e bundle_image_namespace=operator_testing_community -e bundle_index_image_namespace=operator_testing_community -e bundle_index_image_name=catalog"
+    [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 2 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e quay_api_token=$QUAY_API_TOKEN_OPERATOR_TESTING -e bundle_registry=quay.io -e bundle_image_namespace=operator_testing_community -e bundle_index_image_namespace=operator_testing_community -e bundle_index_image_name=catalog"
 
 
     # If community and doing orange_<version>
