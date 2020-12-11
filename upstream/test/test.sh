@@ -217,6 +217,7 @@ fi
 
 OP_TEST_CHECK_STEAM_OK=0
 [ "$OP_TEST_STREAM" = "." ] && [ "$OP_TEST_VERSION" = "sync" ] && OP_TEST_STREAM=$OP_TEST_OPERATOR && OP_TEST_OPERATOR=$OP_TEST_VERSION
+[ "$OP_TEST_STREAM" = "." ] && [ "$OP_TEST_VERSION" = "update" ] && OP_TEST_STREAM=$OP_TEST_OPERATOR && OP_TEST_OPERATOR=$OP_TEST_VERSION
 [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_CHECK_STEAM_OK=1
 [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_CHECK_STEAM_OK=1
 
@@ -230,15 +231,13 @@ function ExecParameters() {
     [[ $1 == kiwi* ]] && OP_TEST_EXEC_USER="-e operator_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR -e operator_version=$OP_TEST_VERSION --tags pure_test"
     [[ $1 == kiwi* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && [[ $OP_TEST_FORCE_DEPLOY_ON_K8S -eq 0 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e test_skip_deploy=true"
     [[ $1 == lemon* ]] && OP_TEST_EXEC_USER="-e operator_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR --tags deploy_bundles"
-    [[ $1 == orange* ]] && [ "$OP_TEST_VERSION" != "sync" ] && OP_TEST_EXEC_USER="-e operator_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR $PROD_REGISTRY_ARGS --tags deploy_bundles"
-
-    # [[ $1 == orange* ]] &&  [ "$OP_TEST_VERSION" = "sync" ] && OP_TEST_EXEC_USER="-e operators_config=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR $PROD_REGISTRY_ARGS --tags deploy_bundles"
+    [[ $1 == orange* ]] && [ "$OP_TEST_VERSION" != "sync" ] && OP_TEST_EXEC_USER="-e operator_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR --tags deploy_bundles"
+    [[ $1 == orange* ]] && [ "$OP_TEST_VERSION" = "update" ] && [[ $OP_TEST_PROD -ge 1 ]] && [[ $OP_TEST_RECREATE -eq 1 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER,remove_operator"
     [[ $1 == orange* ]] &&  [ "$OP_TEST_VERSION" = "sync" ] && OP_TEST_EXEC_USER="--tags deploy_bundles"
 
-
-    [[ $1 == orange* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e production_registry_namespace=quay.io/openshift-community-operators"
-    [[ $1 == orange* ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e production_registry_namespace=quay.io/operatorhubio"
-
+    ## TODO check if needed for sync in prod
+    [[ $1 == orange* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && [ "$OP_TEST_VERSION" != "sync" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e production_registry_namespace=quay.io/openshift-community-operators"
+    [[ $1 == orange* ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && [ "$OP_TEST_VERSION" != "sync" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e production_registry_namespace=quay.io/operatorhubio"
 
     # Handle index_check
     [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER_INDEX_CHECK="-e run_prepare_catalog_repo_upstream=true -e bundle_index_image=quay.io/openshift-community-operators/catalog:latest -e operator_base_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM"
@@ -246,46 +245,40 @@ function ExecParameters() {
     [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER_INDEX_CHECK="-e run_prepare_catalog_repo_upstream=true -e bundle_index_image=quay.io/operatorhubio/catalog:latest -e operator_base_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM"
     [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && [[ $OP_TEST_PROD -eq 3 ]] && OP_TEST_EXEC_USER_INDEX_CHECK="-e run_prepare_catalog_repo_upstream=true -e bundle_index_image=quay.io/operator_testing/catalog:latest -e operator_base_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM"
 
-
-    [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e bundle_registry=quay.io -e bundle_image_namespace=openshift-community-operators -e bundle_index_image_namespace=openshift-community-operators -e bundle_index_image_namespace=openshift-community-operators -e bundle_index_image_name=catalog"
-    [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e quay_api_token=$QUAY_API_TOKEN_OPENSHIFT_COMMUNITY_OP"
+    [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e bundle_registry=quay.io -e bundle_image_namespace=openshift-community-operators -e bundle_index_image_namespace=openshift-community-operators -e bundle_index_image_name=catalog"
     [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e bundle_registry=quay.io -e bundle_image_namespace=operatorhubio -e bundle_index_image_namespace=operatorhubio -e bundle_index_image_name=catalog"
-    [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e quay_api_token=$QUAY_API_TOKEN_OPERATORHUBIO"
-
-    # Only for testing use case
     [[ $1 == orange* ]] && [[ $OP_TEST_PROD -ge 2 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e bundle_registry=quay.io -e bundle_image_namespace=operatorhubio -e bundle_index_image_namespace=operator_testing -e bundle_index_image_name=catalog"
-    [[ $1 == orange* ]] && [[ $OP_TEST_PROD -ge 2 ]] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e quay_api_token=$QUAY_API_TOKEN_OPERATOR_TESTING"
 
+    [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e quay_api_token=$QUAY_API_TOKEN_OPENSHIFT_COMMUNITY_OP"
+    [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e quay_api_token=$QUAY_API_TOKEN_OPERATORHUBIO"
+    [[ $1 == orange* ]] && [[ $OP_TEST_PROD -ge 2 ]] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e quay_api_token=$QUAY_API_TOKEN_OPERATOR_TESTING"
 
     # If community and doing orange_<version>
     [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e use_cluster_filter=true -e supported_cluster_versions_in=${1/orange_/}"
 
     # Failing test when upstream and orgage_<version> (not supported yet)
-    [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER=""
+    [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER="" && { echo "Warning: Index versions are not supported for 'upstream-community-operators' !!! Skipping ..."; OP_TEST_SKIP=1; }
 
     # Don't reset kind when production (It should speedup deploy when kind and registry is not needed)
     [[ $1 == orange* ]] && [[ $OP_TEST_PROD -ge 1 ]] && OP_TEST_RESET=0
 
+    [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && [ "$OP_TEST_VERSION" != "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e fail_on_no_index_change=true"
+    # [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && [[ $OP_TEST_RECREATE -eq 0 ]] && [ "$OP_TEST_VERSION" != "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e fail_on_no_index_change=true"
+    [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && [ "$OP_TEST_VERSION" = "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e fail_on_no_index_change=false -e strict_mode=true -e index_force_update=true"
+    # Handle OP_TEST_VER_OVERWRITE
+    [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 1 ]] && [ "$OP_TEST_VERSION" != "sync" ] && [ "$OP_TEST_VERSION" != "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e operator_version=$OP_TEST_VERSION -e bundle_force_rebuild=true -e fail_on_no_index_change=false"
+
+    # Skipping when version is not defined in case OP_TEST_VER_OVERWRITE=1
     [[ $OP_TEST_VER_OVERWRITE -eq 1 ]] && [ -z $OP_TEST_VERSION ] && { echo "Warning: OP_TEST_VER_OVERWRITE=1 and no version specified 'OP_TEST_VERSION=$OP_TEST_VERSION' !!! Skipping ..."; OP_TEST_SKIP=1; }
 
+    # Skipping case when sync in non prod mode
+    [[ $OP_TEST_PROD -eq 0 ]] && [ "$OP_TEST_VERSION" = "sync" ] && { echo "Warning: No support for 'sync' (try 'update') when 'OP_TEST_PROD=$OP_TEST_PROD' !!! Skipping ..."; OP_TEST_SKIP=1; }
 
-    # Handle index_check
-    # [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER_INDEX_CHECK="-e run_prepare_catalog_repo_upstream=false -e bundle_registry=quay.io -e bundle_index_image_namespace=openshift-community-operators -e bundle_index_image_name=catalog -e operator_base_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM"
-    # [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER_INDEX_CHECK="-e run_prepare_catalog_repo_upstream=false -e bundle_registry=quay.io -e bundle_image_namespace=operatorhubio -e bundle_index_image_name=catalog -e operator_base_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM"
+    [[ $OP_TEST_PROD -eq 0 ]] && [ "$OP_TEST_OPERATOR" = "update" ] && { echo "Warning: No support for 'update' when 'OP_TEST_PROD=$OP_TEST_PROD' when operator name is not defined !!! Skipping ..."; OP_TEST_SKIP=1; }
 
-    # [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER_INDEX_CHECK="$OP_TEST_EXEC_USER_INDEX_CHECK -e bundle_index_image_version=${1/orange_/}"
-
-    # Handle OP_TEST_VER_OVERWRITE
-    [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e fail_on_no_index_change=true"
-    [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 1 ]] && [ "$OP_TEST_VERSION" != "sync" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e operator_version=$OP_TEST_VERSION -e bundle_force_rebuild=true -e fail_on_no_index_change=false -e index_force_update=true"
-
-    # Handle OP_TEST_RECREATE
-    # Handle OP_DELETE
-
-    # Handle ci.yaml only chnage
-
-
-    # -e index_force_update=true -e strict_mode=true : to orange prod
+    # Handling when kiwi and lemon case for production mode
+    [[ $OP_TEST_PROD -ge 1 ]] && [[ $1 == kiwi* ]] && { echo "Warning: No support for 'kiwi' test when 'OP_TEST_PROD=$OP_TEST_PROD' !!! Skipping ..."; OP_TEST_SKIP=1; }
+    [[ $OP_TEST_PROD -ge 1 ]] && [[ $1 == lemon* ]] && { echo "Warning: No support for 'lemon' test when 'OP_TEST_PROD=$OP_TEST_PROD' !!! Skipping ..."; OP_TEST_SKIP=1; }
 
 
 # bundle_index_image_version
@@ -358,7 +351,7 @@ for t in $TESTS;do
         echo -e "[$t] Reseting kind cluster ..."
         run $DRY_RUN_CMD ansible-pull -U $OP_TEST_ANSIBLE_PULL_REPO -C $OP_TEST_ANSIBLE_PULL_BRANCH $OP_TEST_ANSIBLE_DEFAULT_ARGS --tags reset
     fi
-    OP_TEST_KUBECONFIG=$()
+
     echo -e "[$t] Running test ..."
     [[ $OP_TEST_DEBUG -ge 3 ]] && echo "OP_TEST_EXEC_EXTRA=$OP_TEST_EXEC_EXTRA"
     $DRY_RUN_CMD $OP_TEST_CONTAINER_TOOL rm -f $OP_TEST_NAME > /dev/null 2>&1
