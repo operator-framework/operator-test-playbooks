@@ -99,6 +99,7 @@
 
     - name: Push bundle image {{ bundle_index_image }}
       shell: "{{ container_tool }} push {{ container_push_extra }} {{ bundle_index_image }}"
+      environment: "{{ proxy_env }}"
   when:
     - boi_index_version_test.0 is defined
     - bundle_index_image_from is defined
@@ -118,6 +119,7 @@
       shell: "{{ container_tool }} tag {{ operator_input_image }} {{ bundle_images }}"
     - name: "Push image {{ operator_input_image }}"
       shell: "{{ container_tool }} push {{ container_push_extra }} {{ bundle_images }}"
+      environment: "{{ proxy_env }}"
   when:
     - operator_input_image is defined
     - operator_input_image != ""
@@ -135,6 +137,7 @@
 
 - name: "Push bundle image '{{ bundle_index_image }}'"
   shell: "{{ container_tool }} push {{ container_push_extra }} {{ bundle_index_image }}"
+  environment: "{{ proxy_env }}"
   register: boi_iap_rc
   when: boi_ia_rc.rc == 0
 
@@ -174,6 +177,7 @@
               shell: "{{ container_tool }} tag {{ bundle_index_image }} {{ boi_bundle_latest_index_image }}"
             - name: "Push image {{ boi_bundle_latest_index_image }}"
               shell: "{{ container_tool }} push {{ container_push_extra }} {{ boi_bundle_latest_index_image }}"
+              environment: "{{ proxy_env }}"
           when:
             - copy_as_latest_index is defined
             - copy_as_latest_index != ""
