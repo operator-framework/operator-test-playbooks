@@ -20,6 +20,7 @@
 
 - name: "Inspect the copied image directory"
   shell: "skopeo inspect --raw oci://{{ operator_bundle_dir }}"
+  environment: "{{ proxy_env }}"
   register: skopeo_dir_inspect_result
 
 - name: "Parse the image manifest json retrieved by skopeo"
