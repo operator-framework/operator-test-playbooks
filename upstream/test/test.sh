@@ -38,6 +38,9 @@ OP_TEST_RESET=${OP_TEST_RESET-1}
 OP_TEST_LOG_DIR=${OP_TEST_LOG_DIR-"/tmp/op-test"}
 OP_TEST_NOCOLOR=${OP_TEST_NOCOLOR-0}
 
+OHIO_INPUT_CATALOG_IMAGE=${OHIO_INPUT_CATALOG_IMAGE-"quay.io/operatorhubio/catalog:latest"}
+OHIO_REGISTRY_IMAGE=${OHIO_REGISTRY_IMAGE-"quay.io/operator-framework/upstream-community-operators:latest"}
+
 OP_TEST_VER_OVERWRITE=${OP_TEST_VER_OVERWRITE-0}
 OP_TEST_RECREATE=${OP_TEST_RECREATE-0}
 OP_TEST_FORCE_DEPLOY_ON_K8S=${OP_TEST_FORCE_DEPLOY_ON_K8S-0}
@@ -151,6 +154,17 @@ fi
 [[ $OP_TEST_DEBUG -eq 2 ]] && OP_TEST_EXEC_EXTRA="-v $OP_TEST_EXEC_EXTRA"
 [[ $OP_TEST_DEBUG -eq 3 ]] && OP_TEST_EXEC_EXTRA="-vv $OP_TEST_EXEC_EXTRA"
 [[ $OP_TEST_DRY_RUN -eq 1 ]] && DRY_RUN_CMD="echo"
+
+
+# Hide secrets in dry run
+if [[ $OP_TEST_DRY_RUN -eq 1 ]];then
+    QUAY_API_TOKEN_OPENSHIFT_COMMUNITY_OP=""
+    QUAY_API_TOKEN_OPERATORHUBIO=""
+    QUAY_API_TOKEN_OPERATOR_TESTING=""
+    OHIO_REGISTRY_TOKEN=""
+    QUAY_APPREG_TOKEN=""
+    QUAY_COURIER_TOKEN=""
+fi
 
 echo "debug=$OP_TEST_DEBUG"
 
@@ -280,6 +294,10 @@ function ExecParameters() {
     [[ $OP_TEST_PROD -ge 1 ]] && [[ $1 == kiwi* ]] && { echo "Warning: No support for 'kiwi' test when 'OP_TEST_PROD=$OP_TEST_PROD' !!! Skipping ..."; OP_TEST_SKIP=1; }
     [[ $OP_TEST_PROD -ge 1 ]] && [[ $1 == lemon* ]] && { echo "Warning: No support for 'lemon' test when 'OP_TEST_PROD=$OP_TEST_PROD' !!! Skipping ..."; OP_TEST_SKIP=1; }
 
+    [[ $1 == push_to_quay* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER --tags deploy_bundles -e operator_dir=/tmp/community-operators-for-catalog/$OP_TEST_STREAM/$OP_TEST_NAME/$OP_TEST_VERSION -e quay_appregistry_api_token=$QUAY_APPREG_TOKEN -e quay_appregistry_courier_token=$QUAY_COURIER_TOKEN -e production_registry_namespace=quay.io/openshift-community-operators -e index_force_update=true -e bundle_index_image_name=catalog"
+    [[ $1 == push_to_quay* ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER="" && { echo "Warning: Push to quay is not supported for 'upstream-community-operators' !!! Skipping ..."; OP_TEST_SKIP=1; }
+
+    [[ $1 == ohio_image* ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER --tags app_registry -e bundle_index_image=$OHIO_INPUT_CATALOG_IMAGE -e index_export_parallel=true -e app_registry_image=$OHIO_REGISTRY_IMAGE -e quay_api_token=$OHIO_REGISTRY_TOKEN"
 
 # bundle_index_image_version
     # TODO redhat mirror
