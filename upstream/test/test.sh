@@ -297,7 +297,7 @@ function ExecParameters() {
     [[ $1 == push_to_quay* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_RESET=0 && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER --tags deploy_bundles -e operator_dir=/tmp/community-operators-for-catalog/$OP_TEST_STREAM/$OP_TEST_NAME/$OP_TEST_VERSION -e quay_appregistry_api_token=$QUAY_APPREG_TOKEN -e quay_appregistry_courier_token=$QUAY_COURIER_TOKEN -e production_registry_namespace=quay.io/openshift-community-operators -e index_force_update=true -e bundle_index_image_name=catalog"
     [[ $1 == push_to_quay* ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_RESET=0 && OP_TEST_EXEC_USER="" && { echo "Warning: Push to quay is not supported for 'upstream-community-operators' !!! Skipping ..."; OP_TEST_SKIP=1; }
 
-    [[ $1 == ohio_image* ]] && && OP_TEST_RESET=0 && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER --tags app_registry -e bundle_index_image=$OHIO_INPUT_CATALOG_IMAGE -e index_export_parallel=true -e app_registry_image=$OHIO_REGISTRY_IMAGE -e quay_api_token=$OHIO_REGISTRY_TOKEN"
+    [[ $1 == ohio_image* ]] && OP_TEST_RESET=0 && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER --tags app_registry -e bundle_index_image=$OHIO_INPUT_CATALOG_IMAGE -e index_export_parallel=true -e app_registry_image=$OHIO_REGISTRY_IMAGE -e quay_api_token=$OHIO_REGISTRY_TOKEN"
 
 # bundle_index_image_version
     # TODO redhat mirror
