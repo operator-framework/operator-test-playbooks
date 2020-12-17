@@ -159,7 +159,7 @@
     - (quay_push_fix is undefined or quay_push_fix|bool)
     - boi_ia_rc.rc == 0
 
-- name: "Push bundle image '{{ bundle_index_image }}'"
+- name: "Push idex image '{{ bundle_index_image }}'"
   shell: "{{ container_tool }} push {{ container_push_extra }} {{ bundle_index_image }}"
   environment: "{{ proxy_env }}"
   register: boi_iap_rc
