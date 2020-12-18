@@ -300,6 +300,11 @@ function ExecParameters() {
 
     [[ $1 == ohio_image* ]] && OP_TEST_RESET=0 && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER --tags app_registry -e bundle_index_image=$OHIO_INPUT_CATALOG_IMAGE -e index_export_parallel=true -e app_registry_image=$OHIO_REGISTRY_IMAGE -e quay_api_token=$OHIO_REGISTRY_TOKEN"
 
+    [[ $1 == op_delete* ]] && OP_TEST_RESET=0 && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER --tags remove_operator -e operator_dir=/tmp/community-operators-for-catalog/$OP_TEST_STREAM/$OP_TEST_NAME"
+    [[ $1 == op_delete* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e quay_api_token=$QUAY_API_TOKEN_OPENSHIFT_COMMUNITY_OP"
+    [[ $1 == op_delete* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e quay_api_token=$QUAY_API_TOKEN_OPERATORHUBIO"
+    [[ $1 == op_delete* ]] && [[ $OP_TEST_PROD -ge 2 ]] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e quay_api_token=$QUAY_API_TOKEN_OPERATOR_TESTING"
+
 # bundle_index_image_version
     # TODO redhat mirror
     #"-e mirror_index_images=quay.io/redhat/redhat----community-operator-index|redhat+iib_community|$QUAY_RH_INDEX_PW"
