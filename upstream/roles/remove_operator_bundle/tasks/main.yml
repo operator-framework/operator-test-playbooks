@@ -58,7 +58,7 @@
         - name: "Push bundle image {{ bundle_index_image }}"
           shell: "{{ container_tool }} push {{ container_push_extra }} {{ bundle_index_image }}"
           environment: "{{ proxy_env }}"
-          failed_when: false
+          ignore_errors: true
 
         - name: "Remove temporary bundle export dir '{{ bundle_export_dir_remove }}'"
           file:
