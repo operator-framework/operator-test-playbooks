@@ -1,5 +1,17 @@
+
 - name: "Removing operator"
   block:
+
+    - name: "Setting"
+      set_fact:
+        rob_index_version: "{{ bundle_index_image_version }}"
+
+    - name: "Setting"
+      set_fact:
+        rob_index_version: "{{ bob_remove_loop }}"
+      when:
+        - bob_remove_loop is defined
+        - bob_remove_loop != ""
 
     - name: "Setting operator dir name"
       set_fact:
@@ -29,8 +41,8 @@
 
         - name: "Setting bundle image name"
           set_fact:
-            bundle_index_image: "{{ bundle_registry }}/{{ bundle_index_image_namespace }}/{{ bundle_index_image_name }}:{{ bundle_index_image_version }}"
-            opm_index_add_extra_args: "--from-index {{ bundle_registry }}/{{ bundle_index_image_namespace }}/{{ bundle_index_image_name }}:{{ bundle_index_image_version }}"
+            bundle_index_image: "{{ bundle_registry }}/{{ bundle_index_image_namespace }}/{{ bundle_index_image_name }}:{{ rob_index_version }}"
+            opm_index_add_extra_args: "--from-index {{ bundle_registry }}/{{ bundle_index_image_namespace }}/{{ bundle_index_image_name }}:{{ rob_index_version }}"
 
         - name: "Setting 'index rm' container option"
           set_fact:
