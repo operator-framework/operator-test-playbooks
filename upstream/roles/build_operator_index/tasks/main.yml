@@ -68,7 +68,7 @@
 
 - name: "Setting all versions to 'index_versions_in_registry' variable"
   set_fact:
-    index_versions_in_registry: "{{ (boi_registry_versions.json.tags | sort_versions }}"
+    index_versions_in_registry: "{{ boi_registry_versions.json.tags | sort_versions }}"
     # index_versions_in_registry: "{{ (boi_registry_versions.json.tags | sort_versions | join(',') | regex_replace('^v') | regex_replace(',v',',')).split(',') }}"
   when:
     - (openshift_robot_hash_array.2 is undefined or openshift_robot_hash_array.2 == "")
