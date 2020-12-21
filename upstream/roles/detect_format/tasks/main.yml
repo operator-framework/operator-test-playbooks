@@ -46,18 +46,6 @@
         op_dir: "{{ operator_dir }}"
       when: operator_format == "manifest"
 
-    - name: "operator_vars.metadata value"
-      debug:
-        var: operator_vars.metadata
-
-    - name: "operator_vars.metadata.name value {{ operator_vars.metadata.name }}"
-      debug:
-        var: operator_vars.metadata.name
-
-    - name: "Set operator name variable from csv"
-      set_fact:
-        xxx: operator_vars.metadata.name.split('.')
-
     - name: "Set operator name variable from csv"
       set_fact:
         operator_name: "{{ operator_vars.metadata.name.split('.')[0] }}"
