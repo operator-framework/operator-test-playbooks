@@ -283,7 +283,7 @@ function ExecParameters() {
     # Handle OP_TEST_VER_OVERWRITE
     [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 1 ]] && [ "$OP_TEST_VERSION" != "sync" ] && [ "$OP_TEST_VERSION" != "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e operator_version=$OP_TEST_VERSION -e bundle_force_rebuild=true -e fail_on_no_index_change=false"
     # Handle OP_TEST_RECREATE
-    [[ $1 == orange* ]] && [[ $OP_TEST_RECREATE -eq 1 ]] && [ "$OP_TEST_VERSION" != "sync" ] && [ "$OP_TEST_VERSION" != "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e bundle_force_rebuild=true -e fail_on_no_index_change=false"
+    [[ $1 == orange* ]] && [[ $OP_TEST_RECREATE -eq 1 ]] && [[ $OP_TEST_PROD -eq 0 ]] && OP_TEST_SKIP=1
 
     # Skipping when version is not defined in case OP_TEST_VER_OVERWRITE=1
     [[ $OP_TEST_VER_OVERWRITE -eq 1 ]] && [ -z $OP_TEST_VERSION ] && { echo "Warning: OP_TEST_VER_OVERWRITE=1 and no version specified 'OP_TEST_VERSION=$OP_TEST_VERSION' !!! Skipping ..."; OP_TEST_SKIP=1; }
