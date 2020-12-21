@@ -308,7 +308,7 @@ function ExecParameters() {
     [[ $1 == op_delete* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e quay_api_token=$QUAY_API_TOKEN_OPENSHIFT_COMMUNITY_OP"
     [[ $1 == op_delete* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e quay_api_token=$QUAY_API_TOKEN_OPERATORHUBIO"
     [[ $1 == op_delete* ]] && [[ $OP_TEST_PROD -ge 2 ]] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e quay_api_token=$QUAY_API_TOKEN_OPERATOR_TESTING"
-    [[ $1 == op_delete_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e bundle_index_image_version=${1/orange_/}"
+    [[ $1 == op_delete_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e bundle_index_image_version=${1/op_delete_/}"
 
 
 # bundle_index_image_version
