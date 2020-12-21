@@ -2,6 +2,13 @@
 - name: "Removing operator"
   block:
 
+    - name: "Quay login via auth token"
+      shell: "{{ container_tool }} login -u=\\$oauthtoken -p={{ quay_api_token }} quay.io"
+      no_log: True
+      when: 
+        - quay_api_token is defined
+        - quay_api_token != ""
+
     - name: "Setting"
       set_fact:
         rob_index_version: "{{ bundle_index_image_version }}"
