@@ -44,6 +44,7 @@ OHIO_REGISTRY_IMAGE=${OHIO_REGISTRY_IMAGE-"quay.io/operator-framework/upstream-c
 OP_TEST_VER_OVERWRITE=${OP_TEST_VER_OVERWRITE-0}
 OP_TEST_RECREATE=${OP_TEST_RECREATE-0}
 OP_TEST_FORCE_DEPLOY_ON_K8S=${OP_TEST_FORCE_DEPLOY_ON_K8S-0}
+OP_TEST_CI_YAML_ONLY=${OP_TEST_CI_YAML_ONLY-0}
 OP_TEST_UNCOMPLETE="/tmp/operators_uncomplete-localhost.yaml"
 
 
@@ -278,6 +279,7 @@ function ExecParameters() {
 
     [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && [ "$OP_TEST_VERSION" != "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e fail_on_no_index_change=true"
     [[ $1 == orange* ]] && [[ $OP_TEST_PROD -ge 1 ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && [ "$OP_TEST_VERSION" == "sync" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e index_force_update=true"
+    [[ $1 == orange* ]] && [[ $OP_TEST_PROD -ge 1 ]] && [[ $OP_TEST_CI_YAML_ONLY -eq 1 ]] && [ "$OP_TEST_VERSION" == "sync" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e operator_dir=/tmp/community-operators-for-catalog/$OP_TEST_STREAM/$OP_TEST_OPERATOR"
     # [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && [[ $OP_TEST_RECREATE -eq 0 ]] && [ "$OP_TEST_VERSION" != "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e fail_on_no_index_change=true"
     [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && [ "$OP_TEST_VERSION" = "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e fail_on_no_index_change=false -e strict_mode=true -e index_force_update=true"
     # Handle OP_TEST_VER_OVERWRITE
@@ -388,7 +390,7 @@ for t in $TESTS;do
     run $DRY_RUN_CMD $OP_TEST_CONTAINER_TOOL run -d --rm $OP_TEST_CONTAINER_OPT --name $OP_TEST_NAME $OP_TEST_CONAINER_RUN_DEFAULT_ARGS $OP_TEST_CONTAINER_RUN_EXTRA_ARGS $OP_TEST_IMAGE
     [[ $OP_TEST_RESET -eq 1 ]] && run $DRY_RUN_CMD $OP_TEST_CONTAINER_TOOL cp $HOME/.kube $OP_TEST_NAME:/root/
     set -e
-    if [[ $1 == orange* ]] && [[ $OP_TEST_PROD -ge 1 ]] && [ "$OP_TEST_VERSION" = "sync" ];then
+    if [[ $1 == orange* ]] && [[ $OP_TEST_PROD -ge 1 ]] && [[ $OP_TEST_CI_YAML_ONLY -eq 0 ]] && [ "$OP_TEST_VERSION" = "sync" ];then
         echo "$OP_TEST_EXEC_BASE $OP_TEST_EXEC_EXTRA --tags index_check $OP_TEST_EXEC_USER_INDEX_CHECK"
         run $DRY_RUN_CMD $OP_TEST_CONTAINER_TOOL exec $OP_TEST_CONTAINER_OPT $OP_TEST_NAME /bin/bash -c "update-ca-trust && $OP_TEST_EXEC_BASE $OP_TEST_EXEC_EXTRA --tags index_check $OP_TEST_EXEC_USER_INDEX_CHECK"
         $DRY_RUN_CMD $OP_TEST_CONTAINER_TOOL exec $OP_TEST_CONTAINER_OPT $OP_TEST_NAME /bin/bash -c "ls $OP_TEST_UNCOMPLETE" > /dev/null 2>&1 || continue
