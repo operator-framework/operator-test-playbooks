@@ -96,6 +96,9 @@ function iib_install() {
     echo "Installing iib ..."
     $DRY_RUN_CMD ansible-pull -U $OP_TEST_ANSIBLE_PULL_REPO -C $OP_TEST_ANSIBLE_PULL_BRANCH $OP_TEST_ANSIBLE_DEFAULT_ARGS -e run_prepare_catalog_repo_upstream=false --tags iib
     if [[ $? -eq 0 ]];then
+        echo "Loging to registry.redhat.io ..."
+        # $OP_TEST_CONTAINER_TOOL login registry.redhat.io 
+        # $OP_TEST_CONTAINER_TOOL cp $HOME/.docker/config.json iib_iib-worker_1:/root/.docker/config.json.template
         echo -e "\n=================================================================================="
         echo -e "IIB was installed successfully !!!"
         echo -e "==================================================================================\n"
