@@ -2,11 +2,12 @@
 - name: "Mirroring image to multiple locations"
   block:
     - name: "Setting list list of mirrors"
-      # no_log: True
+      no_log: True
       set_fact:
         mi_mirrors: "{{ mirror_index_images.split(',') }}"
 
     - name: "Loop over all mirror locations"
+      no_log: True
       include_tasks: mirror_single.yml
       loop: "{{ mi_mirrors }}"
       loop_control:
