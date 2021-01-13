@@ -41,6 +41,8 @@ OP_TEST_NOCOLOR=${OP_TEST_NOCOLOR-0}
 
 OHIO_INPUT_CATALOG_IMAGE=${OHIO_INPUT_CATALOG_IMAGE-"quay.io/operatorhubio/catalog:latest"}
 OHIO_REGISTRY_IMAGE=${OHIO_REGISTRY_IMAGE-"quay.io/operator-framework/upstream-community-operators:latest"}
+IIB_REGISTRY_USER=${IIB_REGISTRY_USER-""}
+IIB_REGISTRY_TOKEN=${IIB_REGISTRY_TOKEN-""}
 
 OP_TEST_VER_OVERWRITE=${OP_TEST_VER_OVERWRITE-0}
 OP_TEST_RECREATE=${OP_TEST_RECREATE-0}
@@ -97,8 +99,13 @@ function iib_install() {
     $DRY_RUN_CMD ansible-pull -U $OP_TEST_ANSIBLE_PULL_REPO -C $OP_TEST_ANSIBLE_PULL_BRANCH $OP_TEST_ANSIBLE_DEFAULT_ARGS -e run_prepare_catalog_repo_upstream=false --tags iib
     if [[ $? -eq 0 ]];then
         echo "Loging to registry.redhat.io ..."
-        # $OP_TEST_CONTAINER_TOOL login registry.redhat.io 
-        # $OP_TEST_CONTAINER_TOOL cp $HOME/.docker/config.json iib_iib-worker_1:/root/.docker/config.json.template
+        if [ -n "$IIB_REGISTRY_TOKEN" ];then
+          $OP_TEST_CONTAINER_TOOL login registry.redhat.io || { echo "Problem to login to 'registry.redhat.io' !!!"; exit 1; }
+          $OP_TEST_CONTAINER_TOOL cp $HOME/.docker/config.json iib_iib-worker_1:/root/.docker/config.json.template || exit 1
+        else
+            echo "Variable \$IIB_REGISTRY_TOKEN is not set or is empty !!!"
+            exit 1
+        fi
         echo -e "\n=================================================================================="
         echo -e "IIB was installed successfully !!!"
         echo -e "==================================================================================\n"
