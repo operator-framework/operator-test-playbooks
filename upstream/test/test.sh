@@ -43,10 +43,10 @@ OHIO_INPUT_CATALOG_IMAGE=${OHIO_INPUT_CATALOG_IMAGE-"quay.io/operatorhubio/catal
 OHIO_REGISTRY_IMAGE=${OHIO_REGISTRY_IMAGE-"quay.io/operator-framework/upstream-community-operators:latest"}
 
 IIB_PUSH_IMAGE=${IIB_PUSH_IMAGE-"quay.io/operator_testing/catalog:latest"}
-IIB_REGISTRY_USER=${IIB_REGISTRY_USER-"mvalahtv"}
-IIB_REGISTRY_TOKEN=${IIB_REGISTRY_TOKEN-""}
-IIB_REDHAT_USER=${IIB_REDHAT_USER-"redhat+iib_community"}
-IIB_REDHAT_TOKEN=${IIB_REDHAT_TOKEN-""}
+IIB_INPUT_REGISTRY_USER=${IIB_INPUT_REGISTRY_USER-"mvalahtv"}
+IIB_INPUT_REGISTRY_TOKEN=${IIB_INPUT_REGISTRY_TOKEN-""}
+IIB_OUTPUT_REGISTRY_USER=${IIB_OUTPUT_REGISTRY_USER-"redhat+iib_community"}
+IIB_OUTPUT_REGISTRY_TOKEN=${IIB_OUTPUT_REGISTRY_TOKEN-""}
 
 
 OP_TEST_VER_OVERWRITE=${OP_TEST_VER_OVERWRITE-0}
@@ -104,14 +104,14 @@ function iib_install() {
     $DRY_RUN_CMD ansible-pull -U $OP_TEST_ANSIBLE_PULL_REPO -C $OP_TEST_ANSIBLE_PULL_BRANCH $OP_TEST_ANSIBLE_DEFAULT_ARGS -e run_prepare_catalog_repo_upstream=false --tags iib -e iib_push_image="$IIB_PUSH_IMAGE" -e iib_push_registry="$(echo $IIB_PUSH_IMAGE | cut -d '/' -f 1)"
     if [[ $? -eq 0 ]];then
         echo "Loging to registry.redhat.io ..."
-        if [ -n "$IIB_REGISTRY_TOKEN" ];then
-          echo "$IIB_REGISTRY_TOKEN" | $OP_TEST_CONTAINER_TOOL login registry.redhat.io -u $IIB_REGISTRY_USER --password-stdin || { echo "Problem to login to 'registry.redhat.io' !!!"; exit 1; }
-          if [ -n "$IIB_REDHAT_TOKEN" ];then
-            echo "$IIB_REDHAT_TOKEN" | $OP_TEST_CONTAINER_TOOL login quay.io -u $IIB_REDHAT_USER --password-stdin || { echo "Problem to login to 'quay.io' !!!"; exit 1; }
+        if [ -n "$IIB_INPUT_REGISTRY_TOKEN" ];then
+          echo "$IIB_INPUT_REGISTRY_TOKEN" | $OP_TEST_CONTAINER_TOOL login registry.redhat.io -u $IIB_INPUT_REGISTRY_USER --password-stdin || { echo "Problem to login to 'registry.redhat.io' !!!"; exit 1; }
+          if [ -n "$IIB_OUTPUT_REGISTRY_TOKEN" ];then
+            echo "$IIB_OUTPUT_REGISTRY_TOKEN" | $OP_TEST_CONTAINER_TOOL login quay.io -u $IIB_OUTPUT_REGISTRY_USER --password-stdin || { echo "Problem to login to 'quay.io' !!!"; exit 1; }
           fi
           $OP_TEST_CONTAINER_TOOL cp $HOME/.docker/config.json iib_iib-worker_1:/root/.docker/config.json.template || exit 1
         else
-            echo "Variable \$IIB_REGISTRY_TOKEN is not set or is empty !!!"
+            echo "Variable \$IIB_INPUT_REGISTRY_TOKEN is not set or is empty !!!"
             exit 1
         fi
         echo -e "\n=================================================================================="
