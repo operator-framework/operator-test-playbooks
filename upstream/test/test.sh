@@ -101,6 +101,7 @@ function iib_install() {
         echo "Loging to registry.redhat.io ..."
         if [ -n "$IIB_REGISTRY_TOKEN" ];then
           echo "$IIB_REGISTRY_TOKEN" | $OP_TEST_CONTAINER_TOOL login registry.redhat.io -u $IIB_REGISTRY_USER --password-stdin || { echo "Problem to login to 'registry.redhat.io' !!!"; exit 1; }
+          echo "$IIB_REDHAT_TOKEN" | $OP_TEST_CONTAINER_TOOL login quay.io -u $IIB_REDHAT_USER --password-stdin || { echo "Problem to login to 'quay.io' !!!"; exit 1; }
           $OP_TEST_CONTAINER_TOOL cp $HOME/.docker/config.json iib_iib-worker_1:/root/.docker/config.json.template || exit 1
         else
             echo "Variable \$IIB_REGISTRY_TOKEN is not set or is empty !!!"
