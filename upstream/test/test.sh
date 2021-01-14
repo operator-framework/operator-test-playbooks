@@ -96,7 +96,7 @@ function clean() {
 
 function iib_install() {
     echo "Installing iib ..."
-    $DRY_RUN_CMD ansible-pull -U $OP_TEST_ANSIBLE_PULL_REPO -C $OP_TEST_ANSIBLE_PULL_BRANCH $OP_TEST_ANSIBLE_DEFAULT_ARGS -e run_prepare_catalog_repo_upstream=false --tags iib
+    $DRY_RUN_CMD ansible-pull -U $OP_TEST_ANSIBLE_PULL_REPO -C $OP_TEST_ANSIBLE_PULL_BRANCH $OP_TEST_ANSIBLE_DEFAULT_ARGS -e run_prepare_catalog_repo_upstream=false --tags iib -e iib_push_image="quay.io/operator_testing/catalog:latest" -e iib_push_registry="quay.io"
     if [[ $? -eq 0 ]];then
         echo "Loging to registry.redhat.io ..."
         if [ -n "$IIB_REGISTRY_TOKEN" ];then
