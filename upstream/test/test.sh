@@ -99,8 +99,8 @@ function iib_install() {
     $DRY_RUN_CMD ansible-pull -U $OP_TEST_ANSIBLE_PULL_REPO -C $OP_TEST_ANSIBLE_PULL_BRANCH $OP_TEST_ANSIBLE_DEFAULT_ARGS -e run_prepare_catalog_repo_upstream=false --tags iib
     if [[ $? -eq 0 ]];then
         echo "Loging to registry.redhat.io ..."
-        if [ -n "$IIB_REGISTRY_TOKEN" ];then
-          $OP_TEST_CONTAINER_TOOL login registry.redhat.io || { echo "Problem to login to 'registry.redhat.io' !!!"; exit 1; }
+        if [ -n "$IIB_REGISTRY_TOKEN" ];theny
+          echo "$IIB_REGISTRY_TOKEN" | $OP_TEST_CONTAINER_TOOL login registry.redhat.io -u $IIB_REGISTRY_USER --password-stdin || { echo "Problem to login to 'registry.redhat.io' !!!"; exit 1; }
           $OP_TEST_CONTAINER_TOOL cp $HOME/.docker/config.json iib_iib-worker_1:/root/.docker/config.json.template || exit 1
         else
             echo "Variable \$IIB_REGISTRY_TOKEN is not set or is empty !!!"
