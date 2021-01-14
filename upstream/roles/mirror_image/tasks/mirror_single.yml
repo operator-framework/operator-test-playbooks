@@ -72,16 +72,21 @@
           retries: 50
           delay: 10
 
-        - name: "Set input iib image to localhost when using local iib service"
-          set_fact:
-            mi_ms_iib_image: "localhost:8443/iib-build:{{ mi_ms_iib_id }}"
-          when: iib_converted_image_base == "registry:8443/iib-build"
+        # - name: "Set input iib image to localhost when using local iib service"
+        #   set_fact:
+        #     mi_ms_iib_image: "localhost:8443/iib-build:{{ mi_ms_iib_id }}"
+        #   when: iib_converted_image_base == "registry:8443/iib-build"
+
+        # - name: "Transfer image from '{{ mi_ms_iib_image }}' to '{{ ms_info[0] }}'"
+        #   shell: "skopeo copy -a docker://{{ mi_ms_iib_image }} docker://{{ ms_info[0] }} --src-tls-verify=false"
+        #   environment: "{{ proxy_env }}"
+        #   when:
+        #     - (iib_push_skip is undefined or not iib_push_skip|bool)
 
         - name: "Transfer image from '{{ mi_ms_iib_image }}' to '{{ ms_info[0] }}'"
-          shell: "skopeo copy -a docker://{{ mi_ms_iib_image }} docker://{{ ms_info[0] }} --src-tls-verify=false"
+          shell: "{{ container_tool }} exec -it iib_iib-worker_1 skopeo copy -a docker://{{ mi_ms_iib_image }} docker://{{ ms_info[0] }} --src-tls-verify=false"
           environment: "{{ proxy_env }}"
-          when:
-            - (iib_push_skip is undefined or not iib_push_skip|bool)
+
 
       when:
         - mirror_input_image is defined
