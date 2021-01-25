@@ -31,6 +31,7 @@ OP_TEST_EXEC_EXTRA=${OP_TEST_EXEC_EXTRA-"-e container_tool=podman"}
 OP_TEST_RUN_MODE=${OP_TEST_RUN_MODE-"privileged"}
 OP_TEST_LABELS=${OP_TEST_LABELS-""}
 OP_TEST_PROD=${OP_TEST_PROD-0}
+OP_TEST_PRETEST_CUSTOM_SCRIPT=${OP_TEST_PRETEST_CUSTOM_SCRIPT-""}
 OP_TEST_DEBUG=${OP_TEST_DEBUG-0}
 OP_TEST_DRY_RUN=${OP_TEST_DRY_RUN-0}
 OP_TEST_FORCE_INSTALL=${OP_TEST_FORCE_INSTALL-0}
@@ -428,6 +429,14 @@ for t in $TESTS;do
     if [[ $OP_TEST_RESET -eq 1 ]];then
         echo -e "[$t] Reseting kind cluster ..."
         run $DRY_RUN_CMD ansible-pull -U $OP_TEST_ANSIBLE_PULL_REPO -C $OP_TEST_ANSIBLE_PULL_BRANCH $OP_TEST_ANSIBLE_DEFAULT_ARGS --tags reset
+
+        if [ -n "$OP_TEST_PRETEST_CUSTOM_SCRIPT" ];then
+            echo "Running custom script '$OP_TEST_PRETEST_CUSTOM_SCRIPT' ..."
+            [ -f $OP_TEST_PRETEST_CUSTOM_SCRIPT ] || { echo "Custom script '$OP_TEST_PRETEST_CUSTOM_SCRIPT' was not found. Exiting ..."; exit 1; }
+            [[ -x "$OP_TEST_PRETEST_CUSTOM_SCRIPT" ]] || { echo "Custom script '$OP_TEST_PRETEST_CUSTOM_SCRIPT' is not executable. Do 'chmod +x $OP_TEST_PRETEST_CUSTOM_SCRIPT' first !!! Exiting ..."; exit 1; }
+            run $OP_TEST_PRETEST_CUSTOM_SCRIPT
+            echo "Custom script '$OP_TEST_PRETEST_CUSTOM_SCRIPT' done ..."
+        fi
     fi
 
     echo -e "[$t] Running test ..."
