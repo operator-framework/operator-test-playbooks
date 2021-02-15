@@ -85,7 +85,6 @@
 
         - name: "Transfer image from '{{ mi_ms_iib_image }}' to '{{ ms_info[0] }}'"
           shell: "skopeo copy -a docker://{{ mi_ms_iib_image }} docker://{{ ms_info[0] }} --src-tls-verify=false"
-          environment: "{{ proxy_env }}"
 
         - name: "Transfer image from '{{ mi_ms_iib_image }}' to '{{ ms_info[3] }}'"
           shell: "skopeo copy -a docker://{{ mi_ms_iib_image }} docker://{{ ms_info[3] }} --src-tls-verify=false"
