@@ -403,6 +403,7 @@
               Operator '{{ ba_name }}' is NOT in sync between index and git : [FAIL]
               This means that some versions that were added to index were not exported back from index. 
               Note: This might happen when operator runs in replaces mode and has missing some 'replaces' tag in csv file."
+        - name: "Printing error message"
           fail:
             msg: "{{ bio_error_msg.split('\n') }}"
 
