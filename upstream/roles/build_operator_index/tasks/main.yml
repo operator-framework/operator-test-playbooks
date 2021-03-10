@@ -373,12 +373,12 @@
         file_type: directory
       register: boi_git_operators_find
 
-    - name: "Setting list of operators and operator base dir"
+    - name: "Setting list of operator versions from git and index"
       set_fact:
         bio_versions_index: "{{ boi_operators_find.files | map(attribute='path' ) | map('basename') | list | sort_versions }}"
         bio_versions_git: "{{ boi_git_operators_find.files | map(attribute='path' ) | map('basename') | list | sort_versions }}"
 
-    - name: "Setting list of operators and operator base dir"
+    - name: "Setting list version diff list"
       set_fact:
         bio_versions_diff: "{{ bio_versions_index | symmetric_difference(bio_versions_git) }}"
 
@@ -386,13 +386,13 @@
       debug:
         msg: "Operator '{{ ba_name }}' is in sync between index and git : [OK]"
       when:
-        - bio_versions_diff.files.0 is undefined
+        - bio_versions_diff.0 is undefined
 
     - name: "Prints message that operator versions in index are NOT in sync with git"
       debug:
         msg: "Operator '{{ ba_name }}' is NOT in sync between index and git : [FAIL]"
       when:
-        - bio_versions_diff.files.0 is defined
+        - bio_versions_diff.0 is defined
         - (strict_mode is undefined or not strict_mode|bool)
 
     - name: "Prints message that operator versions in index are NOT in sync with git"
@@ -410,7 +410,7 @@
       # fail:
         # msg: "Operator '{{ ba_name }}'' is NOT in sync between index and git : [FAIL]"
       when:
-        - bio_versions_diff.files.0 is defined
+        - bio_versions_diff.0 is defined
         - (strict_mode is defined and strict_mode|bool)
   when:
     - boi_ia_rc.rc == 0
