@@ -21,11 +21,14 @@ ADDED=$(git diff --diff-filter=A upstream/$OPRT_SRC_BRANCH --name-only | tr '\r\
 MODIFIED=$(git diff --diff-filter=M upstream/$OPRT_SRC_BRANCH --name-only | tr '\r\n' ' ')
 REMOVED=$(git diff --diff-filter=D upstream/$OPRT_SRC_BRANCH --name-only | tr '\r\n' ' ')
 RENAMED=$(git diff --diff-filter=R upstream/$OPRT_SRC_BRANCH --name-only | tr '\r\n' ' ')
+ADDED_MODIFIED=$(git diff --diff-filter=AM upstream/$OPRT_SRC_BRANCH --name-only | tr '\r\n' ' ')
 echo "ADDED=$ADDED"
 echo "MODIFIED=$MODIFIED"
+echo "ADDED_MODIFIED=$ADDED_MODIFIED"
 echo "REMOVED=$REMOVED"
 echo "RENAMED=$RENAMED"
 echo "::set-output name=added::$ADDED"
 echo "::set-output name=modified::$MODIFIED"
+echo "::set-output name=added_modified::$ADDED_MODIFIED"
 echo "::set-output name=removed::$REMOVED"
 echo "::set-output name=renamed::$RENAMED"
