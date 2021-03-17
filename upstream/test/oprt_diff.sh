@@ -9,7 +9,7 @@ OPRT_SRC_BRANCH=${OPRT_SRC_BRANCH-"master"}
 
 git clone https://github.com/$OPRT_REPO communit-operators
 cd communit-operators
-git checkout $(git branch -a --contains ${{ github.event.pull_request.head.sha }} | cut -d '/' -f 2-)
+git checkout $(git branch -a --contains $OPRT_SHA | cut -d '/' -f 2-)
 git log --oneline | head
 
 git config --global user.email "test@example.com"
