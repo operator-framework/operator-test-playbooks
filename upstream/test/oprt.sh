@@ -3,6 +3,7 @@ set +o pipefail
 OPRT_REPO=${OPRT_REPO-""}
 OPRT_SHA=${OPRT_SHA-""}
 OPRT_SRC_BRANCH=${OPRT_SRC_BRANCH-"master"}
+export OPRT=1
 
 [ -n "$OPRT_REPO" ] || { echo "Error: '\$OPRT_REPO' is empty !!!"; exit 1; }
 [ -n "$OPRT_SHA" ] || { echo "Error: '\$OPRT_SHA' is empty !!!"; exit 1; }
