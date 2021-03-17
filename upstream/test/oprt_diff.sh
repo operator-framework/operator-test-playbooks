@@ -7,16 +7,17 @@ OPRT_SRC_BRANCH=${OPRT_SRC_BRANCH-"master"}
 [ -n "$OPRT_REPO" ] || { echo "Error: '\$OPRT_REPO' is empty !!!"; exit 1; }
 [ -n "$OPRT_SHA" ] || { echo "Error: '\$OPRT_SHA' is empty !!!"; exit 1; }
 
-git clone https://github.com/$OPRT_REPO community-operators
+git clone https://github.com/$OPRT_REPO community-operators > /dev/null 2>&1
 cd community-operators
-git checkout $(git branch -a --contains $OPRT_SHA | cut -d '/' -f 2-)
+git checkout $(git branch -a --contains $OPRT_SHA | cut -d '/' -f 2-) > /dev/null 2>&1
 git log --oneline | head
 
 git config --global user.email "test@example.com"
 git config --global user.name "Test User"
 
-git remote add upstream https://github.com/operator-framework/community-operators -f
-git pull --rebase upstream $OPRT_SRC_BRANCH        
+git remote add upstream https://github.com/operator-framework/community-operators -f > /dev/null 2>&1
+git pull --rebase upstream $OPRT_SRC_BRANCH > /dev/null 2>&1
+
 ADDED=$(git diff --diff-filter=A upstream/$OPRT_SRC_BRANCH --name-only | tr '\r\n' ' ')
 MODIFIED=$(git diff --diff-filter=M upstream/$OPRT_SRC_BRANCH --name-only | tr '\r\n' ' ')
 REMOVED=$(git diff --diff-filter=D upstream/$OPRT_SRC_BRANCH --name-only | tr '\r\n' ' ')
