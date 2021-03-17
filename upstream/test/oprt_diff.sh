@@ -7,8 +7,8 @@ OPRT_SRC_BRANCH=${OPRT_SRC_BRANCH-"master"}
 [ -n "$OPRT_REPO" ] || { echo "Error: '\$OPRT_REPO' is empty !!!"; exit 1; }
 [ -n "$OPRT_SHA" ] || { echo "Error: '\$OPRT_SHA' is empty !!!"; exit 1; }
 
-git clone https://github.com/$OPRT_REPO communit-operators
-cd communit-operators
+git clone https://github.com/$OPRT_REPO community-operators
+cd community-operators
 git checkout $(git branch -a --contains $OPRT_SHA | cut -d '/' -f 2-)
 git log --oneline | head
 
