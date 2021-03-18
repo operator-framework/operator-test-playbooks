@@ -28,4 +28,5 @@ export OP_TEST_ADDED_MODIFIED_FILES=$(git diff --diff-filter=AM upstream/$OPRT_S
 
 bash <(curl -sL https://raw.githubusercontent.com/operator-framework/community-operators/master/scripts/ci/actions-env)
 
+BRANCH_NAME=$(git branch -a --contains $OPRT_SHA | cut -d '/' -f 3-)
 echo "::set-output name=op_test_repo_branch::$OPRT_REPO/${BRANCH_NAME}"
