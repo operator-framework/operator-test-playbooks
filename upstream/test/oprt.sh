@@ -10,7 +10,8 @@ export OPRT=1
 
 git clone https://github.com/$OPRT_REPO community-operators > /dev/null 2>&1
 cd community-operators
-git checkout $(git branch -a --contains $OPRT_SHA | cut -d '/' -f 2-) > /dev/null 2>&1
+BRANCH_NAME=$(git branch -a --contains $OPRT_SHA | cut -d '/' -f 2-)
+git checkout $BRANCH_NAME > /dev/null 2>&1
 git log --oneline | head
 
 git config --global user.email "test@example.com"
@@ -27,4 +28,4 @@ export OP_TEST_ADDED_MODIFIED_FILES=$(git diff --diff-filter=AM upstream/$OPRT_S
 
 bash <(curl -sL https://raw.githubusercontent.com/operator-framework/community-operators/master/scripts/ci/actions-env)
 
-
+echo "::set-output name=op_test_repo_branch::$OPRT_REPO/${BRANCH_NAME}"
