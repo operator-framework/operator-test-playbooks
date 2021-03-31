@@ -25,6 +25,7 @@
           - software-properties-common
           - virtualenv
           - sqlite3
+          - python-jmespath
         state: latest
         update_cache: yes
     - name: Install python modules
@@ -36,7 +37,6 @@
         name:
           - docker
           - docker-compose
-          - jmespath
         executable: pip3
   become: yes
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
@@ -50,6 +50,7 @@
     name:
       - python3-virtualenv
       - python3-dockerpty
+      - python3-jmespath
       - sqlite
     state: latest
     update_cache: yes
