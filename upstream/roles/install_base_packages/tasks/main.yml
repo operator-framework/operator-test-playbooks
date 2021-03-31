@@ -25,7 +25,7 @@
           - software-properties-common
           - virtualenv
           - sqlite3
-          - python-jmespath
+          - python3-jmespath
         state: latest
         update_cache: yes
     - name: Install python modules
