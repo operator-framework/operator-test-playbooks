@@ -21,12 +21,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Remove ansible
+        run: sudo apt-get remove ansible
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
       - name: Install dependencies
-        run: python -m pip install --upgrade pip jmespath
+        run: python -m pip install --upgrade pip ansible=2.9.6 jmespath
       - name: Preparing operator test environment
         run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
       - name: Operator test
