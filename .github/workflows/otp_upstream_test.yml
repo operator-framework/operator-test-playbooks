@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.x'
       - name: Install dependencies
-        run: python -m pip install --upgrade pip ansible=2.9.6 jmespath
+        run: python -m pip install --upgrade pip ansible==2.9.6 jmespath
       - name: Preparing operator test environment
         run: ansible-playbook $ANSIBLE_BASE_ARGS --tags host_build
       - name: Operator test
