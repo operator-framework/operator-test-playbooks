@@ -1,11 +1,36 @@
 ---
 # executed from Kubernetes and Openshift
+- name: "Prepare vars for Openshift run"
+  block:
+    - name: "Set basics"
+      find:
+        paths: "{{ operator_dir/op_version }}"
+        recurse: yes
+        file_type: file
+        patterns: "annotations.yaml"
+      register: cia_csv_paths
+
+    - name: "Set CSV path"
+      set_fact:
+        csv_file_path: "{{ cia_csv_paths.files | map(attribute='path' ) | list | first }}"
+
+    - name: "Download yq ({{ yq_version }})"
+      get_url:
+        url: "https://github.com/mikefarah/yq/releases/download/{{ yq_version }}/yq_linux_amd64"
+        dest: "{{ yq_bin_path }}"
+        mode: "0755"
+      register: yq_install_result
+      until: yq_install_result.status_code is undefined or yq_install_result.status_code == 200
+      retries: 10
+      delay: 15
+      failed_when: yq_install_result is failure
+
+  when: not run_upstream|bool
+
 - debug:
     var: yq_bin_path
 - debug:
     var: csv_file_path
-- debug:
-    var: csv_path
 
 - name: "Getting external image from csv '{{ csv_file_path | basename}}'"
   shell: "{{ yq_bin_path }} r {{ csv_file_path }} -t metadata.annotations.containerImage"
@@ -28,7 +53,7 @@
   block:
 
     - name: "Check if '{{ operator_external_image }}' is used in a container"
-      shell: "grep {{ operator_external_image }} {{ csv_path }}|wc -l"
+      shell: "grep {{ operator_external_image }} {{ csv_file_path }}|wc -l"
       register: vob_annotation_image_count
 
     - name: "Set annotation image count"
