@@ -1,4 +1,8 @@
 ---
+- name: "Check operator external image availability"
+  include_role:
+    name: check_image_availability
+
 - name: "Set defaults"
   set_fact:
     quay_release: "0.0.1"

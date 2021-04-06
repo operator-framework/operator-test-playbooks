@@ -1,4 +1,8 @@
 ---
+- name: "Check operator external image availability"
+  include_role:
+    name: check_image_availability
+
 - name: "Set OLM namespace to check"
   set_fact:
     olm_namespace_check: "openshift-operator-lifecycle-manager"
