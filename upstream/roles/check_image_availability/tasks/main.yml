@@ -80,10 +80,17 @@
         - run_upstream|bool
         - vob_pull_external_image_kube.rc|int!=0
 
-    - name: "Run external operator image '{{ operator_external_image }}' on Openshift"
-      shell: "{{ oc_bin_path }} run testimagepull --image={{ operator_external_image }}"
-      register: vob_pull_external_image_oc
-      ignore_errors: true
+    - name: "Openshift"
+        - name: "Namespace"
+          shell: "{{ oc_bin_path }} create namespace testimagepull"
+          register: vob_pull_external_image_oc
+          ignore_errors: true
+
+        - name: "Run external operator image '{{ operator_external_image }}' on Openshift"
+          shell: "{{ oc_bin_path }} run testimagepull --image={{ operator_external_image }} -n testimagepull"
+          register: vob_pull_external_image_oc
+          ignore_errors: true
+
       when: not run_upstream|bool
 
     - name: "Print err message on Openshift"
