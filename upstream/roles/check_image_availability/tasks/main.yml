@@ -7,7 +7,7 @@
         paths: "{{ operator_dir }}/{{ op_version }}"
         recurse: yes
         file_type: file
-        patterns: "annotations.yaml"
+        patterns: "*.clusterserviceversion.yaml"
       register: cia_csv_paths
 
     - name: "Set CSV path"

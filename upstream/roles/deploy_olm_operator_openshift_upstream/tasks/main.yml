@@ -1,8 +1,4 @@
 ---
-- name: "Check operator external image availability"
-  include_role:
-    name: check_image_availability
-
 - name: "Set OLM namespace to check"
   set_fact:
     olm_namespace_check: "openshift-operator-lifecycle-manager"
@@ -18,6 +14,10 @@
     path: "/tmp/oc-{{ dir_suffix_part }}/bin"
     state: directory
     mode: '0755'
+
+- name: "Check operator external image availability"
+  include_role:
+    name: check_image_availability
 
 - name: "Download oc"
   shell: "curl https://mirror.openshift.com/pub/openshift-v4/clients/oc/{{ oc_version_test }}/linux/oc.tar.gz | tar xvzf - -C /tmp/oc-{{ dir_suffix_part }}/bin oc --skip-old-files"
