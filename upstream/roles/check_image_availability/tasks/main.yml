@@ -67,15 +67,31 @@
         msg: "Value of 'metadata.annotations.containerImage' not used in any container, please check."
       when: vob_annotation_image_count_stdout|int < 2
 
-    - name: "Pull external operator image '{{ operator_external_image }}'"
+    - name: "Pull external operator image '{{ operator_external_image }}' on Kubernetes"
       shell: "{{ container_tool }} pull {{ operator_external_image }}"
-      register: vob_pull_external_image
+      register: vob_pull_external_image_kube
       ignore_errors: true
+      when: run_upstream|bool
 
-    - name: "Print err message"
+    - name: "Print err message on Kubernetes"
       fail:
         msg: "Unable to pull {{ operator_external_image }}, please check permissions or path."
-      when: vob_pull_external_image.rc|int!=0
+      when:
+        - run_upstream|bool
+        - vob_pull_external_image_kube.rc|int!=0
+
+    - name: "Run external operator image '{{ operator_external_image }}' on Openshift"
+      shell: "{{ oc_bin_path }} run testimagepull --image={{ operator_external_image }}"
+      register: vob_pull_external_image_oc
+      ignore_errors: true
+      when: not run_upstream|bool
+
+    - name: "Print err message on Openshift"
+      fail:
+        msg: "Unable to pull/run {{ operator_external_image }}, please check permissions or path."
+      when:
+        - not run_upstream|bool
+        - vob_pull_external_image_oce.rc|int!=0
 
   when:
     - operator_external_image is defined
