@@ -4,7 +4,7 @@
   block:
     - name: "Set basics"
       find:
-        paths: "{{ operator_dir/op_version }}"
+        paths: "{{ operator_dir }}/{{ op_version }}"
         recurse: yes
         file_type: file
         patterns: "annotations.yaml"
