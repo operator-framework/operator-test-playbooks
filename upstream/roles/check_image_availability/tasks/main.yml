@@ -99,7 +99,7 @@
         msg: "Unable to pull/run {{ operator_external_image }}, please check permissions or path."
       when:
         - not run_upstream|bool
-        - vob_pull_external_image_oce.rc|int!=0
+        - vob_pull_external_image_oc.rc|int!=0
 
   when:
     - operator_external_image is defined
