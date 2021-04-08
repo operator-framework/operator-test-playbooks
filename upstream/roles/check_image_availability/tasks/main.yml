@@ -81,6 +81,7 @@
         - vob_pull_external_image_kube.rc|int!=0
 
     - name: "Openshift"
+      block:
         - name: "Namespace"
           shell: "{{ oc_bin_path }} create namespace testimagepull"
           register: vob_pull_external_image_oc
