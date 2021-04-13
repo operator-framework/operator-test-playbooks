@@ -215,6 +215,10 @@
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
 
+- name: "Debug retries value 2"
+  debug:
+    var: pod_start_retries
+
 - name: "Wait for the catalogsource pod to start up"
   shell: "{{ oc_bin_path }} get pods -n openshift-marketplace | grep test-operators- | grep Running"
   register: operator_source_result
