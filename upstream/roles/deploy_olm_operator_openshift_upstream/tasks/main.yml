@@ -218,7 +218,7 @@
 - name: "Wait for the catalogsource pod to start up"
   shell: "{{ oc_bin_path }} get pods -n openshift-marketplace | grep test-operators- | grep Running"
   register: operator_source_result
-  retries: 60
+  retries: "{{ pod_start_retries }}"
   delay: 10
   until: operator_source_result.rc == 0
   ignore_errors: true
