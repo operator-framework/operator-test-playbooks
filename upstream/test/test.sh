@@ -11,6 +11,7 @@ OP_SCRIPT_URL=${OP_SCRIPT_URL-"https://cutt.ly/WhkV76k"}
 OP_TEST_BASE_DEP="ansible curl openssl git"
 
 INDEX_SAFETY="-e enable_production=true"
+POD_START_RETRIES_LONG_DEPLOYMENT_WAIT_RETRIES=300
 OP_TEST_IMAGE=${OP_TEST_IMAGE-"quay.io/operator_testing/operator-test-playbooks:latest"}
 OP_TEST_CERT_DIR=${OP_TEST_CERT_DIR-"$HOME/.optest/certs"}
 OP_TEST_CONTAINER_TOOL=${OP_TEST_CONTAINER_TOOL-"docker"}
@@ -57,6 +58,7 @@ OP_TEST_CI_YAML_ONLY=${OP_TEST_CI_YAML_ONLY-0}
 OP_TEST_UNCOMPLETE="/tmp/operators_uncomplete-localhost.yaml"
 OP_TEST_MIRROR_LATEST_TAG=${OP_TEST_MIRROR_LATEST_TAG-"v4.6"}
 DELETE_APPREG=${DELETE_APPREG-0}
+OP_TEST_DEPLOY_LONGER=${OP_TEST_DEPLOY_LONGER-0}
 
 export GODEBUG=${GODEBUG-x509ignoreCN=0}
 
@@ -186,6 +188,7 @@ if [ -n "$OP_TEST_LABELS" ];then
     [[ "$l" = "test/force-deploy-on-kubernetes" ]] && export OP_TEST_FORCE_DEPLOY_ON_K8S=1
     [[ "$l" = "verbosity/high" ]] && export OP_TEST_DEBUG=2
     [[ "$l" = "verbosity/debug" ]] && export OP_TEST_DEBUG=3
+    [[ "$l" = "allow/longer-deployment" ]] && export OP_TEST_DEPLOY_LONGER=1
     done
 else
     echo "Info: No labels defined"
@@ -288,6 +291,7 @@ function ExecParameters() {
     OP_TEST_SKIP=0
     [[ $1 == kiwi* ]] && OP_TEST_EXEC_USER="-e operator_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR -e operator_version=$OP_TEST_VERSION --tags pure_test -e operator_channel_force=optest"
     [[ $1 == kiwi* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && [[ $OP_TEST_FORCE_DEPLOY_ON_K8S -eq 0 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e test_skip_deploy=true"
+    [[ $1 == kiwi* ]] && [[ $OP_TEST_DEPLOY_LONGER -eq 1 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e pod_start_retries=$POD_START_RETRIES_LONG_DEPLOYMENT_WAIT_RETRIES"
     [[ $1 == lemon* ]] && OP_TEST_EXEC_USER="-e operator_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR --tags deploy_bundles"
     [[ $1 == orange* ]] && [ "$OP_TEST_VERSION" != "sync" ] && OP_TEST_EXEC_USER="-e operator_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR --tags deploy_bundles"
     # [[ $1 == orange* ]] && [ "$OP_TEST_VERSION" = "update" ] && [[ $OP_TEST_PROD -ge 1 ]] && [[ $OP_TEST_RECREATE -eq 1 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER,remove_operator"
