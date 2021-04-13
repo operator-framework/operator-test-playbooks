@@ -6,6 +6,9 @@
 
   tasks:
 
+    - name: "Debug retries value 1"
+      debug:
+        var: pod_start_retries
     - name: "Deploy on OCP"
       include_role:
         name: deploy_olm_operator_openshift_upstream
