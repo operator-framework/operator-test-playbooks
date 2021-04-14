@@ -215,14 +215,10 @@
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
 
-- name: "Debug retries value 2"
-  debug:
-    var: pod_start_retries
-
 - name: "Wait for the catalogsource pod to start up"
   shell: "{{ oc_bin_path }} get pods -n openshift-marketplace | grep test-operators- | grep Running"
   register: operator_source_result
-  retries: "{{ pod_start_retries }}"
+  retries: 60
   delay: 10
   until: operator_source_result.rc == 0
   ignore_errors: true
@@ -284,7 +280,7 @@
 - name: "Wait for the operator {{ operator_pod_name }} pod to start up"
   shell: "{{ oc_bin_path }} get pods -n {{ openshift_namespace }}| grep {{ operator_pod_name }} | grep Running"
   register: operator_result
-  retries: 90
+  retries: "{{ pod_start_retries }}"
   delay: 10
   until: operator_result.rc == 0
   ignore_errors: true
