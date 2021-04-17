@@ -10,7 +10,7 @@ export OPRT=1
 
 git clone https://github.com/$OPRT_REPO community-operators > /dev/null 2>&1
 cd community-operators
-BRANCH_NAME=$(git branch -a --contains $OPRT_SHA | cut -d '/' -f 2-)
+BRANCH_NAME=$(git branch -a --contains $OPRT_SHA | grep remotes/ | grep -v HEAD | cut -d '/' -f 2-)
 git checkout $BRANCH_NAME > /dev/null 2>&1
 git log --oneline | head
 
