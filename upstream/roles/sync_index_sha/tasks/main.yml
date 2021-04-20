@@ -10,15 +10,16 @@
     name: export_list_of_packages_from_index
   vars:
     bundle_index_image_input: "{{ sis_index_image_input }}"
+    elopfi_filter: "/{{ ba_name }}:"
 
 - debug:
-    var: elopfi_index_operators
+    var: elopfi_index_bundles
 
 - name: "Filling shas bundles for '{{ operator_package_name }}'"
   include_tasks: bundle_sha.yml
   vars:
     sis_registry_namespace: "{{ bundle_registry }}/{{ bundle_image_namespace }}"
-  with_items: "{{ elopfi_index_operators }}"
+  with_items: "{{ elopfi_index_bundles }}"
 
 - name: "Print list of bundles using shas"
   debug:
