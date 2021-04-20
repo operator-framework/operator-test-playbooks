@@ -276,7 +276,7 @@
     sis_package_name: "{{ ba_name }}"
   when:
     - bundle_index_image is defined
-    - bundle_index_image is not search("kind-registry:5000/.*")
+    # - bundle_index_image is not search("kind-registry:5000/.*")
     - bundle_index_sha_posfix is defined
     - bundle_index_sha_posfix != ""
 

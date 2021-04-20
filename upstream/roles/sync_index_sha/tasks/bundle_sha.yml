@@ -1,5 +1,5 @@
-- name: "Getting sha from operator bundle version '{{ sis_registry_namespace }}/{{ item }}'"
-  shell: "skopeo inspect docker://{{ sis_registry_namespace }}/{{ item }}"
+- name: "Getting sha from operator bundle version '{{ item }}'"
+  shell: "skopeo inspect docker://{{ item }}"
   register: bs_skopeo_inspect
 
 - name: "Reseting bs_skopeo_inspect_info"
@@ -11,9 +11,15 @@
     bs_skopeo_inspect_info: "{{ bs_skopeo_inspect.stdout | from_json }}"
   when: bs_skopeo_inspect.rc == 0
 
-- name: "Adding sha as version for {{ sis_registry_namespace }}/{{ item }} "
+
+- name: "Parsing output image with login information"
+  no_log: True
   set_fact:
-    bob_bundles_sha_arr: "{{ bob_bundles_sha_arr | default([]) }} + [ '{{ sis_registry_namespace }}/{{ operator_package_name }}@{{ bs_skopeo_inspect_info.Digest }}' ]"
+    bs_bundle: "{{ item.split(':') }}"
+
+- name: "Adding sha as version for {{ item }} "
+  set_fact:
+    bob_bundles_sha_arr: "{{ bob_bundles_sha_arr | default([]) }} + [ '{{ bs_bundle[0] }}@{{ bs_skopeo_inspect_info.Digest }}' ]"
   when: 
     - bs_skopeo_inspect_info.Digest is defined
     - bs_skopeo_inspect_info.Digest != ""

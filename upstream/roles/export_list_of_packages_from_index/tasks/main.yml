@@ -26,15 +26,19 @@
       shell: "{{ container_tool }} cp {{ sanity_check_container_name }}:/database/index.db {{ sqlite_db_file }}"
 
     - name: "Getting list of operators"
-      shell: "{{ sqlite_tool }} {{ sqlite_db_file }} 'select bundlepath from operatorbundle' | sed 's/^\ | $//g'| cut -sd / -f 3- | paste -sd, -"
+      shell: "{{ sqlite_tool }} {{ sqlite_db_file }} 'select bundlepath from operatorbundle' | sed 's/^\ | $//g' | grep '{{ elopfi_filter }}' | cut -sd / -f 3- | paste -sd, -"
       register: elopfi_index_operators_out
       no_log: true
 
     - name: "Getting list of packages"
-      shell: "{{ sqlite_tool }} {{ sqlite_db_file }} 'select bundlepath from operatorbundle' | sed 's/^\ | $//g'| cut -sd / -f 3- | cut -sd: -f 1 | uniq | paste -sd, -"
+      shell: "{{ sqlite_tool }} {{ sqlite_db_file }} 'select bundlepath from operatorbundle' | sed 's/^\ | $//g' | grep '{{ elopfi_filter }}' |cut -sd / -f 3- | cut -sd: -f 1 | uniq | paste -sd, -"
       register: elopfi_index_packages_out
       no_log: true
 
+    - name: "Getting list of bundles"
+      shell: "{{ sqlite_tool }} {{ sqlite_db_file }} 'select bundlepath from operatorbundle' | sed 's/^\ | $//g' | grep '{{ elopfi_filter }}' | uniq | paste -sd, -"
+      register: elopfi_index_bundles_out
+      no_log: true
 
     - name: "Stop index container '{{ sanity_check_container_name }}'"
       shell: "{{ container_tool }} rm -f {{ sanity_check_container_name }}"
@@ -43,6 +47,7 @@
       set_fact:
         elopfi_index_operators: "{{ elopfi_index_operators_out.stdout.split(',') }}"
         elopfi_index_packages: "{{ elopfi_index_packages_out.stdout.split(',') }}"
+        elopfi_index_bundles: "{{ elopfi_index_bundles_out.stdout.split(',') }}"
 
     - name: "Check if index has critical amount of operators, less than {{ min_operators_in_index_allowed }}"
       block:
