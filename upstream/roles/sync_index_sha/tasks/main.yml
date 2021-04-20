@@ -11,6 +11,7 @@
   vars:
     bundle_index_image_input: "{{ sis_index_image_input }}"
     elopfi_filter: "/{{ ba_name }}:"
+    min_operators_in_index_allowed: ""
 
 - debug:
     var: elopfi_index_bundles
