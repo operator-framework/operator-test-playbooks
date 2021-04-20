@@ -286,6 +286,7 @@ Usage:
 | bundle_image_namespace | Quay registry url. [string] | test-operator | operator_testing |
 | bundle_index_image_namespace | Quay registry url. [string] | test-operator | operator_testing |
 | bundle_index_image_name | Quay registry url. [string] | index | upstream-community-operators-index |
+| bundle_index_sha_posfix | Index name postfix used for index build from bundle shas instead of tags. (example : "s)[string] | "" | "" |
 | container_tool | Container tool to use. [string] | docker  | as default |
 | opm_container_tool | Container tool to use when using opm tool. [string] | docker  | as default |
 | opm_container_tool_index | Container tool to use when using opm tool. [string] | docker  | as default |

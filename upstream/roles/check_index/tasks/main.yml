@@ -4,6 +4,8 @@
     - name: "Exporting information from index image '{{ bundle_index_image }}'"
       include_role:
         name: export_list_of_packages_from_index
+      vars:
+        bundle_index_image_input: "{{ bundle_index_image }}"
 
     - name: "Find all directories in git repo"
       shell:

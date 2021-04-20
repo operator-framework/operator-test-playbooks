@@ -24,6 +24,8 @@
     - name: "Exporting information from index image '{{ bundle_index_image }}'"
       include_role:
         name: export_list_of_packages_from_index
+      vars:
+        bundle_index_image_input: "{{ bundle_index_image }}"
 
     - name: "Setting list of all operators from index image '{{ bundle_index_image }}'"
       set_fact:

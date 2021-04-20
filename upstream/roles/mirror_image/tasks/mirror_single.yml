@@ -29,6 +29,7 @@
           include_role:
             name: export_list_of_packages_from_index
           vars:
+            bundle_index_image_input: "{{ bundle_index_image }}"
             index_pull_skip: true
           when: min_operators_in_index_allowed is defined
           
