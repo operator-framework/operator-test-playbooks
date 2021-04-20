@@ -9,13 +9,13 @@
       no_log: true
 
       ## ckeck if not kind
-    - name: "Pulling index container {{ bundle_index_image }}"
-      shell: "{{ container_tool }} pull {{ bundle_index_image }}"
+    - name: "Pulling index container {{ bundle_index_image_input }}"
+      shell: "{{ container_tool }} pull {{ bundle_index_image_input }}"
       when: not index_pull_skip
 
-    - name: "Start index container {{ bundle_index_image }}"
-      # shell: "{{ container_tool }} run -d --name {{ sanity_check_container_name }} {{ bundle_index_image }}"
-      shell: "{{ container_tool }} create --name {{ sanity_check_container_name }} {{ bundle_index_image }}"
+    - name: "Start index container {{ bundle_index_image_input }}"
+      # shell: "{{ container_tool }} run -d --name {{ sanity_check_container_name }} {{ bundle_index_image_input }}"
+      shell: "{{ container_tool }} create --name {{ sanity_check_container_name }} {{ bundle_index_image_input }}"
 
     - name: "Remove db filename '{{ sqlite_db_file }}'"
       file:
@@ -64,7 +64,7 @@
     - deploy_bundles
     - index_check
   when:
-    - bundle_index_image is defined
-    - bundle_index_image != ""
-#    - bundle_index_image is not search("kind-registry:5000/.*")
+    - bundle_index_image_input is defined
+    - bundle_index_image_input != ""
+#    - bundle_index_image_input is not search("kind-registry:5000/.*")
 

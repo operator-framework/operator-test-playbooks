@@ -106,6 +106,7 @@
       include_role:
         name: export_list_of_packages_from_index
       vars:
+        bundle_index_image_input: "{{ bundle_index_image }}"
         index_pull_skip: true
       when: min_operators_in_index_allowed is defined
 
@@ -227,6 +228,7 @@
   include_role:
     name: export_list_of_packages_from_index
   vars:
+    bundle_index_image_input: "{{ bundle_index_image }}"
     index_pull_skip: true
   when: min_operators_in_index_allowed is defined
 
@@ -266,6 +268,18 @@
     - not result_rc|bool
     - (strict_mode is defined and strict_mode|bool)
 
+- name: "Sync index sha"
+  include_role:
+    name: sync_index_sha
+  vars:
+    sis_index_image_input: "{{ bundle_index_image }}"
+    sis_package_name: "{{ ba_name }}"
+  when:
+    - bundle_index_image is defined
+    - bundle_index_image is not search("kind-registry:5000/.*")
+    - bundle_index_sha_posfix is defined
+    - bundle_index_sha_posfix != ""
+
 - name: "Unset 'boi_latest_index_found'"
   set_fact:
     boi_latest_index_found:
@@ -299,6 +313,7 @@
             #     name: export_list_of_packages_from_index
             #   vars:
             #     index_pull_skip: true
+            #     bundle_index_image_input: "{{ bundle_index_image }}"
             # #   Maybe we can implement own image variable
             # #   elopfi_index_image: "{{ boi_bundle_latest_index_image }}"
             #   when: min_operators_in_index_allowed is defined
@@ -338,6 +353,7 @@
       with_items:
         - absent
         - directory
+
     - name: "Setting 'index export' container option"
       set_fact:
         boi_index_args: "-c {{ opm_container_tool_index }}"
