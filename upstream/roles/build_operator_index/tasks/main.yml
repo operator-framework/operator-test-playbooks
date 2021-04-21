@@ -308,21 +308,25 @@
             - name: "Retag image {{ bundle_index_image }}"
               shell: "{{ container_tool }} tag {{ bundle_index_image }} {{ boi_bundle_latest_index_image }}"
 
-            # - name: "Index safety check to avoid accidental overwrite"
-            #   include_role:
-            #     name: export_list_of_packages_from_index
-            #   vars:
-            #     index_pull_skip: true
-            #     bundle_index_image_input: "{{ bundle_index_image }}"
-            # #   Maybe we can implement own image variable
-            # #   elopfi_index_image: "{{ boi_bundle_latest_index_image }}"
-            #   when: min_operators_in_index_allowed is defined
-
             - name: "Push index image '{{ boi_bundle_latest_index_image }}'"
               include_role:
                 name: operator_push_image
               vars:
                 fqp_image: "{{ boi_bundle_latest_index_image }}"
+
+            - name: "Retag index to latest "
+              block:
+                - name: "Retag image {{ boi_bundle_latest_index_image }}{{ bundle_index_sha_posfix }}"
+                  shell: "{{ container_tool }} tag {{ bundle_index_image }}{{ bundle_index_sha_posfix }} {{ boi_bundle_latest_index_image }}{{ bundle_index_sha_posfix }}"
+
+                - name: "Push index image '{{ boi_bundle_latest_index_image }}{{ bundle_index_sha_posfix }}'"
+                  include_role:
+                    name: operator_push_image
+                  vars:
+                    fqp_image: "{{ boi_bundle_latest_index_image }}{{ bundle_index_sha_posfix }}"
+              when:
+                - bundle_index_sha_posfix is defined
+                - bundle_index_sha_posfix != ""
 
           when:
             - supported_cluster_version_latest is defined
