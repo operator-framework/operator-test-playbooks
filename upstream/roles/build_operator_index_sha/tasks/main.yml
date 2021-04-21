@@ -24,8 +24,6 @@
 
 - name: "Filling shas bundles for '{{ sis_package_name }}'"
   include_tasks: bundle_sha.yml
-  vars:
-    sis_registry_namespace: "{{ bundle_registry }}/{{ bundle_image_namespace }}"
   with_items: "{{ elopfi_index_bundles_op }}"
 
 - name: "Print list of bundles using shas"
@@ -143,3 +141,12 @@
   when:
     - not result_rc|bool
     - (strict_mode is defined and strict_mode|bool)
+
+- name: "Cleanup local images"
+  shell: "{{ opm_container_tool }} rmi -f {{ image_item }}"
+  failed_when: false
+  loop: "{{ elopfi_index_bundles_op }}"
+  loop_control:
+    loop_var: image_item
+
+  
