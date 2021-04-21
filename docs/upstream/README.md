@@ -263,6 +263,16 @@ time ansible-playbook -vv -i localhost, local.yml \
 -e index_export_parallel=true
 ```
 
+## Sync index and index sha
+```
+ansible-playbook -i localhost, upstream/local.yml -e run_upstream=true \
+-e sis_index_image_input=quay.io/operatorhubio/catalog:latest \
+-e sis_index_image_output=quay.io/operatorhubio/catalog:latests \
+-e op_base_name="upstream-community-operators" \
+--tags sync_index_sha \
+-e quay_api_token=xxx
+```
+
 ## Misc options to use
 
 Usage:
