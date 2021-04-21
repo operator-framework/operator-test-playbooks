@@ -65,7 +65,7 @@ fi
 $CONTAINER_CMD run -d \
    --restart=always \
    --name "${reg_name}" \
-   -v $CERTS_DIR:/certs \
+   -v $CERTS_DIR:/certs:Z \
    -e REGISTRY_HTTP_ADDR=0.0.0.0:${reg_port} \
    -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
    -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
