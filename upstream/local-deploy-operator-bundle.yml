@@ -43,14 +43,14 @@
         mirror_apply: true
         doic_skip_file_check: false
 
-    - name: "Quay login"
-      shell: "{{ container_tool }} login -u=\"{{ quay_user }}\" -p={{ quay_password }} quay.io"
-      no_log: True
-      when:
-        - quay_user is defined
-        - quay_password is defined
-        - quay_user != ""
-        - quay_password != ""
+    # - name: "Quay login"
+    #   shell: "{{ container_tool }} login -u=\"{{ quay_user }}\" -p={{ quay_password }} quay.io"
+    #   no_log: True
+    #   when:
+    #     - quay_user is defined
+    #     - quay_password is defined
+    #     - quay_user != ""
+    #     - quay_password != ""
 
     - name: "Parsing 'openshift_robot_hash' variable"
       set_fact:
@@ -65,10 +65,10 @@
       no_log: True
       when: (quay_user is undefined or quay_password is undefined or quay_user == "" or quay_password == "") and openshift_robot_hash_array.1 is defined and openshift_robot_hash_array.1 != ""
 
-    - name: "Quay login via auth token"
-      shell: "{{ container_tool }} login -u=\\$oauthtoken -p={{ quay_api_token }} quay.io"
-      no_log: True
-      when: (quay_user is undefined or quay_password is undefined or quay_user == "" or quay_password == "") and quay_api_token is defined and quay_api_token != ""
+    # - name: "Quay login via auth token"
+    #   shell: "{{ container_tool }} login -u=\\$oauthtoken -p={{ quay_api_token }} quay.io"
+    #   no_log: True
+    #   when: (quay_user is undefined or quay_password is undefined or quay_user == "" or quay_password == "") and quay_api_token is defined and quay_api_token != ""
 
     - name: "Generate Operators config file from all operators"
       block:

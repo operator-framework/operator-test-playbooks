@@ -1,131 +1,45 @@
-- name: "Setting empty bundles array"
+---
+- name: "Export list of packages"
+  include_role:
+    name: export_list_of_packages_from_index
+  vars:
+    bundle_index_image_input: "{{ sis_index_image_output }}"
+    min_operators_in_index_allowed: ""
+
+- name: "Setting list of package"
   set_fact:
-    bob_bundles_sha_arr: []
-    sis_bundles: []
-    sis_index_image_output: "{{ sis_index_image_input }}{{ bundle_index_sha_posfix }}"
-    sis_opm_extra_args: ""
+    output_packages: "{{ elopfi_index_packages | map('regex_replace', '@sha256', '') | list }}"
 
 - name: "Export list of packages"
   include_role:
     name: export_list_of_packages_from_index
   vars:
     bundle_index_image_input: "{{ sis_index_image_input }}"
-    elopfi_filter: "/{{ ba_name }}:"
     min_operators_in_index_allowed: ""
 
+- name: "Setting list of package"
+  set_fact:
+    input_packages: "{{ elopfi_index_packages }}"
+
+
+- name: "Setting list of package"
+  set_fact:
+    sis_missing_packages: "{{ input_packages | difference(output_packages) }}"
+
 - debug:
-    var: elopfi_index_bundles
+    var: input_packages
 
-- name: "Filling shas bundles for '{{ operator_package_name }}'"
-  include_tasks: bundle_sha.yml
-  vars:
-    sis_registry_namespace: "{{ bundle_registry }}/{{ bundle_image_namespace }}"
-  with_items: "{{ elopfi_index_bundles }}"
+- debug:
+    var: output_packages
 
-- name: "Print list of bundles using shas"
-  debug:
-    var: bob_bundles_sha_arr
+- debug:
+    var: sis_missing_packages
 
-- name: "Setting bundle image names index add mode"
-  set_fact:
-    bundle_sha_images: "{{ bob_bundles_sha_arr | join(',') }}"
 
-- name: "Pull index image '{{ sis_index_image_output }}' (before removal of '{{ ba_name }}' operator)"
-  shell: "{{ container_tool }} pull {{ sis_index_image_output }}"
-  register: sis_pull_result
-  failed_when: false
+- name: "Loop over missing packages"
+  include_tasks: single_operator.yml
+  loop: "{{ sis_missing_packages }}"
+  loop_control:
+    loop_var: si_item
 
-- name: "Setting bundle image names index add mode"
-  set_fact:
-    sis_opm_extra_args: "--from-index {{ sis_index_image_output }}"
-  when: sis_pull_result.rc == 0
 
-- name: "Remove operator from idnex"
-  block:
-    - name: "Remove previous versions of '{{ sis_package_name }}' operator from index image {{ sis_index_image_output }}"
-      shell: "{{ opm_bin_path }} index rm {{ boi_index_args }} --operators {{ sis_package_name }} --tag {{ sis_index_image_output }} {{ sis_opm_extra_args }}"
-      register: sis_index_rm_rc
-
-    - name: "Push index image {{ sis_index_image_output }}"
-      include_role:
-        name: operator_push_image
-      vars:
-        fqp_image: "{{ sis_index_image_output }}"
-      when: sis_index_rm_rc.rc == 0
-
-    - name: "Set 'result_rc' to false"
-      set_fact:
-        result_rc: false
-    - name: "Set 'result_rc'"
-      set_fact:
-        result_rc: true
-      when: ((bio_index_rm_rc.rc is defined and bio_index_rm_rc.rc == 0) and rc_last|bool)
-    - name: "Prints message that bundles were added to catalog"
-      debug:
-        msg: "Operator '{{ sis_package_name }}' were removed and push to catalog '{{ sis_index_image_output }}' : [OK]"
-      when:
-        - result_rc|bool
-    - name: "Print failing msg that bundle was not added to catalog or not pushed"
-      debug:
-        msg: "Operator '{{ sis_package_name }}' were removed and push to catalog '{{ sis_index_image_output }}' : [FAIL]"
-      when:
-        - not result_rc|bool
-        - (strict_mode is undefined or not strict_mode|bool)
-    - name: "Failing when bundle was not added to catalog or not pushed"
-      fail:
-        msg: "Operator '{{ sis_package_name }}' were removed and push to catalog '{{ sis_index_image_output }}' : : [FAIL]"
-      when:
-        - not result_rc|bool
-        - (strict_mode is defined and strict_mode|bool)
-  when: 
-    - sis_opm_extra_args is defined
-    - sis_opm_extra_args != ""
-
-- name: "Add '{{ sis_package_name }}' operator to index image {{ sis_index_image_output }}"
-  shell: "{{ opm_bin_path }} index add -u {{ opm_container_tool }} --bundles {{ bundle_sha_images }} --tag {{ sis_index_image_output }} --mode {{ opm_index_add_mode }} {{ sis_opm_extra_args }}"
-  ignore_errors: yes
-  register: boi_ia_rc
-
-- name: "Index safety check to avoid accidental overwrite"
-  include_role:
-    name: export_list_of_packages_from_index
-  vars:
-    sis_index_image_output_input: "{{ sis_index_image_output }}"
-    index_pull_skip: true
-  when: min_operators_in_index_allowed is defined
-
-- name: "Push index image '{{ sis_index_image_output }}'"
-  include_role:
-    name: operator_push_image
-  vars:
-    fqp_image: "{{ sis_index_image_output }}"
-  when: boi_ia_rc.rc == 0
-
-- name: "Set 'result_rc' to false"
-  set_fact:
-    result_rc: false
-
-- name: "Set 'result_rc'"
-  set_fact:
-    result_rc: true
-  when: ((boi_ia_rc.rc is defined and boi_ia_rc.rc == 0) and rc_last|bool)
-
-- name: "Prints message that bundles were added to catalog"
-  debug:
-    msg: "Bundles '{{ bundle_sha_images }}'' were added and push to catalog '{{ sis_index_image_output }}' using mode '{{ opm_index_add_mode }}' : [OK]"
-  when:
-    - result_rc|bool
-
-- name: "Print failing msg that bundle was not added to catalog or not pushed"
-  debug:
-    msg: "Bundle '{{ bundle_sha_images }}'' was not added or not pushed to '{{ sis_index_image_output }}' using mode '{{ opm_index_add_mode }}' : [FAIL]"
-  when:
-    - not result_rc|bool
-    - (strict_mode is undefined or not strict_mode|bool)
-
-- name: "Failing when bundle was not added to catalog or not pushed"
-  fail:
-    msg: "Bundle '{{ bundle_sha_images }}'' was not added or not pushed to '{{ sis_index_image_output }}' using mode '{{ opm_index_add_mode }}' : [FAIL]"
-  when:
-    - not result_rc|bool
-    - (strict_mode is defined and strict_mode|bool)

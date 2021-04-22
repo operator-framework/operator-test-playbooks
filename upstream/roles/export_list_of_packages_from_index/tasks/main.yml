@@ -1,7 +1,6 @@
 ---
 - name: "Extracting info from index image"
   block:
-
     - name: "Stop previous index container '{{ sanity_check_container_name }}''"
       shell: "{{ container_tool }} rm -f {{ sanity_check_container_name }}"
       failed_when: false
@@ -28,7 +27,7 @@
     - name: "Getting list of operators"
       shell: "{{ sqlite_tool }} {{ sqlite_db_file }} 'select bundlepath from operatorbundle' | sed 's/^\ | $//g' | grep '{{ elopfi_filter }}' | cut -sd / -f 3- | paste -sd, -"
       register: elopfi_index_operators_out
-      no_log: true
+      # no_log: true
 
     - name: "Getting list of packages"
       shell: "{{ sqlite_tool }} {{ sqlite_db_file }} 'select bundlepath from operatorbundle' | sed 's/^\ | $//g' | grep '{{ elopfi_filter }}' |cut -sd / -f 3- | cut -sd: -f 1 | uniq | paste -sd, -"
