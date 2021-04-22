@@ -18,3 +18,4 @@
 - name: "Sets operator variables from ci.yaml '{{ ecy_path | basename }}'"
   set_fact:
     ci_yaml_vars: "{{ ci_data_updateGraph.stdout | from_yaml }}"
+  when: ci_data_updateGraph.rc == 0
