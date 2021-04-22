@@ -64,7 +64,7 @@ df -h
 
 $CONTAINER_TOOL pull $OP_RUN_IMAGE
 $CONTAINER_TOOL rm -f test
-$CONTAINER_TOOL run -d --net=host --privileged -e STORAGE_DRIVER=vfs --rm -it --name test $OP_RUN_IMAGE
+$CONTAINER_TOOL run -d --net=host --privileged -e STORAGE_DRIVER=vfs --rm -t --name test $OP_RUN_IMAGE
 
 [ -z "$OP_NAME" ] && { echo "Error: Missing '\$OP_NAME'"; exit 1; }
 [ -z "$OP_NAME" ] && { echo "Error: Missing '\$OP_NAME'"; exit 1; }
@@ -72,7 +72,7 @@ $CONTAINER_TOOL run -d --net=host --privileged -e STORAGE_DRIVER=vfs --rm -it --
 [ -z "$COMMIT" ] && { echo "Error: Missing '\$COMMIT'"; exit 1; }
 [ -z "$OP_TOKEN" ] && { echo "Error: Missing '\$OP_TOKEN'"; exit 1; }
 
-$CONTAINER_TOOL exec -it \
+$CONTAINER_TOOL exec -t \
 -e OP_STREAM="$STREAM_NAME" \
 -e OP_NAME="$OP_NAME" \
 -e OP_VERSION="$OP_VER" \
