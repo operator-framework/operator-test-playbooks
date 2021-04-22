@@ -62,7 +62,7 @@ DetectFromGit
 
 $CONTAINER_TOOL pull $OP_RUN_IMAGE
 $CONTAINER_TOOL rm -f test
-$CONTAINER_TOOL run -d --net=host --privileged -e STORAGE_DRIVER=vfs --rm -it --name test $OP_RUN_IMAGE
+$CONTAINER_TOOL run -d --net=host --privileged -e STORAGE_DRIVER=vfs --rm -t --name test $OP_RUN_IMAGE
 
 [ -z "$OP_NAME" ] && { echo "Error: Missing '\$OP_NAME'"; exit 1; }
 [ -z "$OP_NAME" ] && { echo "Error: Missing '\$OP_NAME'"; exit 1; }
