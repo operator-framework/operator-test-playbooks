@@ -60,6 +60,8 @@ cd community-operators
 git checkout $BRANCH || { echo "Problem checkout branch '$BRANCH' !!!"; exit 1; }
 DetectFromGit
 
+df -h
+
 $CONTAINER_TOOL pull $OP_RUN_IMAGE
 $CONTAINER_TOOL rm -f test
 $CONTAINER_TOOL run -d --net=host --privileged -e STORAGE_DRIVER=vfs --rm -t --name test $OP_RUN_IMAGE
