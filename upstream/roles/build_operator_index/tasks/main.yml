@@ -159,15 +159,15 @@
     bundle_images: "{{ ba_bundles | join(',') }}"
     opm_index_add_mode: "semver"
 
-- name: "Retag bundle input image"
-  block:
-    - name: "Retag image {{ operator_input_image }}"
-      shell: "{{ container_tool }} tag {{ operator_input_image }} {{ bundle_images }}"
-    - name: "Push image {{ operator_input_image }}"
-      shell: "{{ container_tool }} push {{ container_push_extra }} {{ bundle_images }}"
-  when:
-    - operator_input_image is defined
-    - operator_input_image != ""
+# - name: "Retag bundle input image"
+#   block:
+#     - name: "Retag image {{ operator_input_image }}"
+#       shell: "{{ container_tool }} tag {{ operator_input_image }} {{ bundle_images }}"
+#     - name: "Push image {{ operator_input_image }}"
+#       shell: "{{ container_tool }} push {{ container_push_extra }} {{ bundle_images }}"
+#   when:
+#     - operator_input_image is defined
+#     - operator_input_image != ""
 
 - name: "Handling index add mode from '{{ ba_name }}/{{ opm_index_ci_filename }}' file"
   block:
@@ -223,6 +223,7 @@
   shell: "{{ opm_bin_path }} index add -u {{ opm_container_tool }} --bundles {{ bundle_images }} --tag {{ bundle_index_image }} --mode {{ opm_index_add_mode }} {{ opm_index_add_extra_args }}"
   ignore_errors: yes
   register: boi_ia_rc
+  when: bundle_images != ""
 
 - name: "Index safety check to avoid accidental overwrite"
   include_role:
