@@ -9,7 +9,7 @@ OP_RUN_IMAGE=${OP_RUN_IMAGE-"quay.io/operator_testing/operator-test-playbooks:la
 [ ! -n "$REPO" ] && REPO=$OP_PR
 
 function DetectFromGit() {
-  COMMIT=$(git --no-pager log -n1 --pretty=format:%h | tail -n 1)
+#  COMMIT=$(git --no-pager log -n1 --pretty=format:%h | tail -n 1)
   echo
 #  echo "Target commit $COMMIT"
 #  echo "git log"
