@@ -60,7 +60,7 @@ if [ -z $BRANCH ];then
 fi
 
 rm -rf community-operators
-git clone $REPO || { echo "Problem cloning repo '$REPO' !!!"; exit 1; }
+git clone "https://github.com/$REPO" || { echo "Problem cloning repo '$REPO' !!!"; exit 1; }
 cd community-operators
 git checkout $BRANCH || { echo "Problem checkout branch '$BRANCH' !!!"; exit 1; }
 DetectFromGit
@@ -81,7 +81,7 @@ $CONTAINER_TOOL exec -t \
 -e OP_STREAM="$STREAM_NAME" \
 -e OP_NAME="$OP_NAME" \
 -e OP_VERSION="$OP_VER" \
--e OP_REPO="$REPO" \
+-e OP_REPO="https://github.com/$REPO" \
 -e OP_BRANCH="$BRANCH" \
 -e OP_OSR_HASH="quay.io/operator_testing|$OP_TOKEN|$COMMIT" \
 -e OP_DEBUG=$OP_DEBUG \
