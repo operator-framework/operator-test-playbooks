@@ -3,6 +3,7 @@ set +o pipefail
 OPRT_REPO=${OPRT_REPO-""}
 OPRT_SHA=${OPRT_SHA-""}
 OPRT_SRC_BRANCH=${OPRT_SRC_BRANCH-"master"}
+OPRT_SCRIPT=${OPRT_SCRIPT-"https://raw.githubusercontent.com/operator-framework/community-operators/master/scripts/ci/actions-env"}
 export OPRT=1
 
 [ -n "$OPRT_REPO" ] || { echo "Error: '\$OPRT_REPO' is empty !!!"; exit 1; }
@@ -30,6 +31,6 @@ BRANCH_NAME=$(echo $BRANCH_NAME | cut -d '/' -f 2-)
 echo "BRANCH_NAME=$BRANCH_NAME"
 echo "::set-output name=op_test_repo_branch::$OPRT_REPO/${BRANCH_NAME}"
 
-bash <(curl -sL https://raw.githubusercontent.com/operator-framework/community-operators/master/scripts/ci/actions-env)
+bash <(curl -sL $OPRT_SCRIPT)
 
 
