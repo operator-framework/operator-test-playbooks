@@ -60,6 +60,8 @@
           - spec.description
           - spec.DisplayName
           - spec.icon
+          - metadata.annotations.description
+          - metadata.annotations.alm-examples
         supported_cluster_versions: "latest"
         supported_cluster_version_latest: "latest"
         use_cluster_filter: false
