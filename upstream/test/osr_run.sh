@@ -22,6 +22,10 @@ function DetectFromGit() {
   CHANGED_FILES=$OP_TEST_ADDED_MODIFIED_FILES
   echo
 
+  COMMIT_TEMP="$COMMIT"
+  COMMIT=$(echo ${COMMIT_TEMP::8});
+  echo $COMMIT
+
   for sf in ${CHANGED_FILES[@]}; do
   echo $sf
   if [ $(echo $sf| awk -F'/' '{print NF}') -ge 4 ]; then
