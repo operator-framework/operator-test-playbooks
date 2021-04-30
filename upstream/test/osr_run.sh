@@ -5,20 +5,25 @@ OP_DEBUG=${OP_DEBUG-0}
 OP_TOKEN=${OP_TOKEN-""}
 CONTAINER_TOOL=${CONTAINER_TOOL-"docker"}
 OP_RUN_IMAGE=${OP_RUN_IMAGE-"quay.io/operator_testing/operator-test-playbooks:latest"}
+
+[ ! -n "$REPO" ] && REPO=$OP_PR
+
 function DetectFromGit() {
   COMMIT=$(git --no-pager log -n1 --pretty=format:%h | tail -n 1)
   echo
-  echo "Target commit $COMMIT"
-  echo "git log"
-  git --no-pager log --oneline|head
-  echo
-  echo "Source commit details:"
-  git --no-pager log -m -1 --name-only --first-parent $COMMIT
+#  echo "Target commit $COMMIT"
+#  echo "git log"
+#  git --no-pager log --oneline|head
+#  echo
+#  echo "Source commit details:"
+#  git --no-pager log -m -1 --name-only --first-parent $COMMIT
   declare -A CHANGED_FILES
   ##community only
   echo "changed community files:"
-  CHANGED_FILES=$(git --no-pager log -m -1 --name-only $COMMIT|grep -v 'upstream-community-operators/'|grep 'community-operators/') || { echo '******* No community operator (Openshift) modified, no reason to continue *******'; exit 0; }
+#  CHANGED_FILES=$(git --no-pager log -m -1 --name-only $COMMIT|grep -v 'upstream-community-operators/'|grep 'community-operators/') || { echo '******* No community operator (Openshift) modified, no reason to continue *******'; exit 0; }
+  CHANGED_FILES=$OP_TEST_ADDED_MODIFIED_FILES
   echo
+
   for sf in ${CHANGED_FILES[@]}; do
   echo $sf
   if [ $(echo $sf| awk -F'/' '{print NF}') -ge 4 ]; then
