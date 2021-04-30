@@ -1,12 +1,10 @@
 #!/bin/bash
-REPO=${1-""}
-BRANCH=${2-""}
+#REPO=${1-""}
+#BRANCH=${2-""}
 OP_DEBUG=${OP_DEBUG-0}
 OP_TOKEN=${OP_TOKEN-""}
 CONTAINER_TOOL=${CONTAINER_TOOL-"docker"}
 OP_RUN_IMAGE=${OP_RUN_IMAGE-"quay.io/operator_testing/operator-test-playbooks:latest"}
-
-[ ! -n "$REPO" ] && REPO=$OP_PR
 
 function DetectFromGit() {
 #  COMMIT=$(git --no-pager log -n1 --pretty=format:%h | tail -n 1)
@@ -42,22 +40,6 @@ function DetectFromGit() {
   echo "COMMIT=$COMMIT"
 
 }
-
-if [ -z $BRANCH ];then
-    if ! command -v jq > /dev/null 2>&1; then
-        echo "Error: 'jq' is not installed. Please install it first !!!"
-        exit 1
-    fi
-
-    tmpfile=$(mktemp /tmp/XXXXXX.json)
-    curl -s https://api.github.com/repos/operator-framework/community-operators/pulls/$REPO -o $tmpfile
-    REPO=$(cat $tmpfile | jq -r '.head.repo.clone_url')
-    BRANCH=$(cat $tmpfile | jq -r '.head.ref')
-    COMMIT=$(cat $tmpfile | jq -r '.head.sha')
-    echo "Pull request #$1 : $REPO $BRANCH $COMMIT"
-    rm -f $tmpfile > /dev/null 2>&1
-
-fi
 
 rm -rf community-operators
 git clone "https://github.com/$REPO" || { echo "Problem cloning repo '$REPO' !!!"; exit 1; }
