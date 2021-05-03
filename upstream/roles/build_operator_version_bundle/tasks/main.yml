@@ -240,7 +240,7 @@
             - name: "Getting info from 'labels.yaml'"
               block:
                 - name: "Getting content of labels file '{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/metadata/labels.yaml'"
-                  shell: cat {{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/metadata/labels.yaml
+                  shell: cat "{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/metadata/labels.yaml"
                   register: bovb_bundle_labels_data
 
                 - name: "Setting lables variables"
