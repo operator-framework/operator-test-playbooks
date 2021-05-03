@@ -199,6 +199,11 @@
         #   ignore_errors: yes
         #   register: bb_rc
 
+        - name: "Remove docker file '{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/Dockerfile'"
+          file:
+            path: "{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/Dockerfile"
+            state: absent
+
         - name: "Checking for presence of Dockerfile in '{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}'"
           stat:
             path: "{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/Dockerfile"
@@ -235,7 +240,7 @@
             - name: "Getting info from 'labels.yaml'"
               block:
                 - name: "Getting content of labels file '{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/metadata/labels.yaml'"
-                  shell: cat {{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/metadata/labels.yaml
+                  shell: cat "{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/metadata/labels.yaml"
                   register: bovb_bundle_labels_data
 
                 - name: "Setting lables variables"
