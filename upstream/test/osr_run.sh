@@ -19,7 +19,7 @@ function DetectFromGit() {
   ##community only
   echo "changed community files:"
 #  CHANGED_FILES=$(git --no-pager log -m -1 --name-only $COMMIT|grep -v 'upstream-community-operators/'|grep 'community-operators/') || { echo '******* No community operator (Openshift) modified, no reason to continue *******'; exit 0; }
-  CHANGED_FILES=$OP_TEST_ADDED_MODIFIED_FILES
+  CHANGED_FILES=$OP_TEST_ADDED_MODIFIED_RENAMED_FILES
   echo
 
   COMMIT_TEMP="$COMMIT"
