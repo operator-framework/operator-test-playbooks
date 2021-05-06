@@ -309,6 +309,90 @@
 
 #gather logs
 
+- name: "Get subscription"
+  shell: "{{ oc_bin_path }} get sub -n {{ openshift_namespace }} | grep test-operators-ocs | cut -f1 -d' '| xargs -I{} oc describe sub {} -n {{ openshift_namespace }}"
+  register: dooou_get_sub_result
+  ignore_errors: true
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+
+- name: "Output get OperatorGroup"
+  copy:
+    content: "{{ dooou_get_sub_result.stdout }}"
+    dest: "{{ work_dir }}/dooou_get_sub_result.txt"
+  when: dooou_get_sub_result.stdout != ""
+  ignore_errors: true
+
+- name: "Append error output to get pods log"
+  blockinfile:
+    path: "{{ work_dir }}/dooou_get_sub_result.txt"
+    block: |
+      {{ dooou_get_sub_result.stderr }}
+  ignore_errors: true
+
+- name: "Get OperatorGroup"
+  shell: "{{ oc_bin_path }} get OperatorGroup -n {{ openshift_namespace }} | grep test-operators | cut -f1 -d' '| xargs -I{} oc describe OperatorGroup {} -n {{ openshift_namespace }}"
+  register: dooou_get_operatorgroup_result
+  ignore_errors: true
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+
+- name: "Output get OperatorGroup"
+  copy:
+    content: "{{ dooou_get_pods_result.stdout }}"
+    dest: "{{ work_dir }}/dooou_get_operatorgroup_result.txt"
+  when: dooou_get_operatorgroup_result.stdout != ""
+  ignore_errors: true
+
+- name: "Append error output to get pods log"
+  blockinfile:
+    path: "{{ work_dir }}/dooou_get_operatorgroup_result.txt"
+    block: |
+      {{ dooou_get_operatorgroup_result.stderr }}
+  ignore_errors: true
+
+- name: "Get pods"
+  shell: "{{ oc_bin_path }} get pods -n {{ openshift_namespace }} | grep {{ operator_pod_name }} | cut -f1 -d' '| xargs -I{} {{ oc_bin_path }} describe pod {} -n {{ openshift_namespace }}"
+  register: dooou_get_pods_result
+  ignore_errors: true
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+
+- name: "Output get pods"
+  copy:
+    content: "{{ dooou_get_pods_result.stdout }}"
+    dest: "{{ work_dir }}/dooou_get_pods_result.txt"
+  when: dooou_get_pods_result.stdout != ""
+  ignore_errors: true
+
+- name: "Append error output to get pods log"
+  blockinfile:
+    path: "{{ work_dir }}/dooou_get_pods_result.txt"
+    block: |
+      {{ dooou_get_pods_result.stderr }}
+  ignore_errors: true
+
+- name: "Get deployments"
+  shell: "{{ oc_bin_path }} get deployments -n {{ openshift_namespace }} | grep {{ operator_pod_name }} | cut -f1 -d' '| xargs -I{} {{ oc_bin_path }} describe deployment {} -n {{ openshift_namespace }}"
+  register: dooou_get_deployments_result
+  ignore_errors: true
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+
+- name: "Output get deployments to a debug file"
+  copy:
+    content: "{{ dooou_get_deployments_result.stdout }}"
+    dest: "{{ work_dir }}/dooou_get_deployments_result.txt"
+  when: dooou_get_deployments_result.stdout != ""
+  ignore_errors: true
+
+- name: "Append error output to get deployments log"
+  blockinfile:
+    path: "{{ work_dir }}/dooou_get_deployments_result.txt"
+    block: |
+      {{ dooou_get_deployments_result.stderr }}
+  ignore_errors: true
+
 - name: "Get the details of the deployed CSVs"
   shell: "{{ oc_bin_path }} describe csvs"
   register: csv_describe_result
@@ -442,6 +526,21 @@
   ignore_errors: true
 
 #output all
+- name: "Output debug - get OperatorGroup"
+  shell: "cat {{ work_dir }}/dooou_get_operatorgroup_result.txt"
+  ignore_errors: true
+
+- name: "Output debug - get subscription"
+  shell: "cat {{ work_dir }}/dooou_get_sub_result.txt"
+  ignore_errors: true
+
+- name: "Output debug - get pods"
+  shell: "cat {{ work_dir }}/dooou_get_pods_result.txt"
+  ignore_errors: true
+
+- name: "Output debug - get deployments"
+  shell: "cat {{ work_dir }}/dooou_get_deployments_result.txt"
+  ignore_errors: true
 
 - name: "Output debug - installplan"
   shell: "cat {{ work_dir }}/olm-installplan-debug.txt"
@@ -452,6 +551,9 @@
 - name: "Output debug - catalogsource"
   shell: "cat {{ work_dir }}/olm-catalog-source-debug.txt"
   ignore_errors: true
+
+#operatorgroup
+#subscription
 
 - name: "Output debug - csv"
   shell: "cat {{ work_dir }}/olm-operator-csv-debug.txt"
