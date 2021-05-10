@@ -185,6 +185,20 @@
         - openshift_robot_hash_array.2 is defined
         - openshift_robot_hash_array.2 != ""
 
+
+    - name: "Handle situation when bundle force rebuild"
+      block:
+        - name: "Remove bundle image {{ bundle_image }}"
+          shell: "{{ container_tool }} rmi -f {{ bundle_image }}"
+          failed_when: false
+
+        - name: "Checking existence of bundle image '{{ bundle_image }}'"
+          shell: "{{ container_tool }} pull {{ bundle_image }}"
+          failed_when: false
+          register: bovb_bundle_image_pull_test
+      when:
+        - (bundle_force_rebuild is undefined or not bundle_force_rebuild|bool)
+
     - name: "Creating bundle image from bundle format directory structure"
       block:
         - name: "Remove bundle image {{ bundle_image }}"
@@ -326,7 +340,9 @@
             - bbp_rc.rc is defined
             - bbp_rc.rc == 0
 
-      when: operator_format == "bundle"
+      when: 
+        - operator_format == "bundle"
+        - (bovb_bundle_image_pull_test.rc is undefined or bovb_bundle_image_pull_test.rc != 0)
 
     - name: "Creating bundle image from manifest format directory structure"
       block:
@@ -391,7 +407,10 @@
             - mb_rc.rc is defined
             - mb_rc.rc == 0
 
-      when: operator_format == "manifest"
+      when: 
+        - operator_format == "manifest"
+        - (bovb_bundle_image_pull_test.rc is undefined or bovb_bundle_image_pull_test.rc != 0)
+
 
     - name: "Add failed operators when creating bundle"
       set_fact:
