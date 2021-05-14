@@ -22,6 +22,7 @@ OP_TEST_ANSIBLE_DEFAULT_ARGS=${OP_TEST_ANSIBLE_DEFAULT_ARGS-"-i localhost, -e an
 IIB_INPUT_REGISTRY_USER=${IIB_INPUT_REGISTRY_USER-"mvalahtv"}
 IIB_OUTPUT_REGISTRY_USER=${IIB_OUTPUT_REGISTRY_USER-"redhat+iib_community"}
 #$OP_TEST_CONTAINER_TOOL rm -f $OP_TEST_NAME > /dev/null 2>&1
+OP_TEST_MIRROR_LATEST_TAG=${OP_TEST_MIRROR_LATEST_TAG-"v4.6"}
 
 function iib_install() {
     echo "Installing iib ..."
@@ -59,7 +60,8 @@ elif [ "$1" == "openshift" ];then
   OP_TEST_EXEC_USER="-e sis_index_image_input=quay.io/openshift-community-operators/catalog:$OP_TEST_INDEX_IMAGE_TAG -e sis_index_image_output=quay.io/openshift-community-operators/catalog:${OP_TEST_INDEX_IMAGE_TAG}${OP_TEST_INDEX_POSTFIX} -e op_base_name=community-operators"
   OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e mirror_multiarch_image=registry.redhat.io/openshift4/ose-operator-registry:v4.5 -e mirror_apply=true -e bundle_index_image=quay.io/openshift-community-operators/catalog:${OP_TEST_INDEX_IMAGE_TAG}${OP_TEST_INDEX_POSTFIX}"
   OP_TEST_EXEC_USER_SECRETS="-e quay_api_token=$QUAY_API_TOKEN_OPENSHIFT_COMMUNITY_OP"
-  OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e mirror_index_images=\"quay.io/redhat/redhat----community-operator-index:${OP_TEST_INDEX_IMAGE_TAG}|redhat+iib_community|$QUAY_RH_INDEX_PW|$OP_TEST_MIRROR_IMAGE_POSTFIX\""
+  [ "$OP_TEST_MIRROR_LATEST_TAG" == "${OP_TEST_INDEX_IMAGE_TAG}" ] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e mirror_index_images=\"quay.io/redhat/redhat----community-operator-index:${OP_TEST_INDEX_IMAGE_TAG}|redhat+iib_community|$QUAY_RH_INDEX_PW|$OP_TEST_MIRROR_IMAGE_POSTFIX|quay.io/redhat/redhat----community-operator-index:latest\""
+  [ "$OP_TEST_MIRROR_LATEST_TAG" != "${OP_TEST_INDEX_IMAGE_TAG}" ] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e mirror_index_images=\"quay.io/redhat/redhat----community-operator-index:${OP_TEST_INDEX_IMAGE_TAG}|redhat+iib_community|$QUAY_RH_INDEX_PW|$OP_TEST_MIRROR_IMAGE_POSTFIX\""
   OP_TEST_EXEC_EXTRA="$OP_TEST_EXEC_EXTRA,mirror_index"
 else
   echo "Only supported input is 'kubernetes' or 'openshift'"
