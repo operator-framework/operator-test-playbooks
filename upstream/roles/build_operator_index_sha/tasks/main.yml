@@ -93,61 +93,73 @@
     - sis_opm_extra_args != ""
     - not sis_index_rm_skip|bool
 
-- name: "Add '{{ sis_package_name }}' operator to index image {{ sis_index_image_output }}"
-  shell: "{{ opm_bin_path }} index add -u {{ opm_container_tool }} --bundles {{ bundle_sha_images }} --tag {{ sis_index_image_output }} --mode {{ opm_index_add_mode }} {{ sis_opm_extra_args }}"
-  ignore_errors: yes
-  register: sis_ia_rc
-  when: bundle_sha_images != ""
 
-- name: "Index safety check to avoid accidental overwrite"
-  include_role:
-    name: export_list_of_packages_from_index
-  vars:
-    sis_index_image_output_input: "{{ sis_index_image_output }}"
-    index_pull_skip: true
-  when: min_operators_in_index_allowed is defined
+- name: "Remove operator from idnex"
+  block:
+    - name: "Add '{{ sis_package_name }}' operator to index image {{ sis_index_image_output }}"
+      shell: "{{ opm_bin_path }} index add -u {{ opm_container_tool }} --bundles {{ bundle_sha_images }} --tag {{ sis_index_image_output }} --mode {{ opm_index_add_mode }} {{ sis_opm_extra_args }}"
+      ignore_errors: yes
+      register: sis_ia_rc
+      when: bundle_sha_images != ""
 
-- name: "Push index image '{{ sis_index_image_output }}'"
-  include_role:
-    name: operator_push_image
-  vars:
-    fqp_image: "{{ sis_index_image_output }}"
-  when: sis_ia_rc.rc == 0
+    - name: "Index safety check to avoid accidental overwrite"
+      include_role:
+        name: export_list_of_packages_from_index
+      vars:
+        sis_index_image_output_input: "{{ sis_index_image_output }}"
+        index_pull_skip: true
+      when: min_operators_in_index_allowed is defined
 
-- name: "Set 'result_rc' to false"
-  set_fact:
-    result_rc: false
+    - name: "Push index image '{{ sis_index_image_output }}'"
+      include_role:
+        name: operator_push_image
+      vars:
+        fqp_image: "{{ sis_index_image_output }}"
+      when: sis_ia_rc.rc == 0
 
-- name: "Set 'result_rc'"
-  set_fact:
-    result_rc: true
-  when: ((sis_ia_rc.rc is defined and sis_ia_rc.rc == 0) and rc_last|bool)
+    - name: "Set 'result_rc' to false"
+      set_fact:
+        result_rc: false
 
-- name: "Prints message that bundles were added to catalog"
-  debug:
-    msg: "Bundles '{{ bundle_sha_images }}'' were added and push to catalog '{{ sis_index_image_output }}' using mode '{{ opm_index_add_mode }}' : [OK]"
-  when:
-    - result_rc|bool
+    - name: "Set 'result_rc'"
+      set_fact:
+        result_rc: true
+      when: ((sis_ia_rc.rc is defined and sis_ia_rc.rc == 0) and rc_last|bool)
 
-- name: "Print failing msg that bundle was not added to catalog or not pushed"
-  debug:
-    msg: "Bundle '{{ bundle_sha_images }}'' was not added or not pushed to '{{ sis_index_image_output }}' using mode '{{ opm_index_add_mode }}' : [FAIL]"
-  when:
-    - not result_rc|bool
-    - (strict_mode is undefined or not strict_mode|bool)
+    - name: "Prints message that bundles were added to catalog"
+      debug:
+        msg: "Bundles '{{ bundle_sha_images }}'' were added and push to catalog '{{ sis_index_image_output }}' using mode '{{ opm_index_add_mode }}' : [OK]"
+      when:
+        - result_rc|bool
 
-- name: "Failing when bundle was not added to catalog or not pushed"
-  fail:
-    msg: "Bundle '{{ bundle_sha_images }}'' was not added or not pushed to '{{ sis_index_image_output }}' using mode '{{ opm_index_add_mode }}' : [FAIL]"
-  when:
-    - not result_rc|bool
-    - (strict_mode is defined and strict_mode|bool)
+    - name: "Print failing msg that bundle was not added to catalog or not pushed"
+      debug:
+        msg: "Bundle '{{ bundle_sha_images }}'' was not added or not pushed to '{{ sis_index_image_output }}' using mode '{{ opm_index_add_mode }}' : [FAIL]"
+      when:
+        - not result_rc|bool
+        - (strict_mode is undefined or not strict_mode|bool)
 
-- name: "Cleanup local images"
-  shell: "{{ opm_container_tool }} rmi -f {{ image_item }}"
-  failed_when: false
-  loop: "{{ elopfi_index_bundles_op }}"
-  loop_control:
-    loop_var: image_item
+    - name: "Failing when bundle was not added to catalog or not pushed"
+      fail:
+        msg: "Bundle '{{ bundle_sha_images }}'' was not added or not pushed to '{{ sis_index_image_output }}' using mode '{{ opm_index_add_mode }}' : [FAIL]"
+      when:
+        - not result_rc|bool
+        - (strict_mode is defined and strict_mode|bool)
+
+    - name: "Cleanup local images"
+      shell: "{{ opm_container_tool }} rmi -f {{ image_item }}"
+      failed_when: false
+      loop: "{{ elopfi_index_bundles_op }}"
+      loop_control:
+        loop_var: image_item
+  when: 
+    - sis_opm_extra_args is defined
+    - sis_opm_extra_args != ""
+    - not sis_index_add_skip|bool
+
+
+
+
+
 
   

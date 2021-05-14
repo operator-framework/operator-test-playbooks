@@ -51,14 +51,14 @@ IIB_INPUT_REGISTRY_TOKEN=${IIB_INPUT_REGISTRY_TOKEN-""}
 IIB_OUTPUT_REGISTRY_USER=${IIB_OUTPUT_REGISTRY_USER-"redhat+iib_community"}
 IIB_OUTPUT_REGISTRY_TOKEN=${IIB_OUTPUT_REGISTRY_TOKEN-""}
 OP_TEST_MIRROR_IMAGE_POSTFIX=${OP_TEST_MIRROR_IMAGE_POSTFIX-""}
-
+OP_TEST_INDEX_MIRROR=${OP_TEST_INDEX_MIRROR-1}
+OP_TEST_MIRROR_LATEST_TAG=${OP_TEST_MIRROR_LATEST_TAG-"v4.6"}
 
 OP_TEST_VER_OVERWRITE=${OP_TEST_VER_OVERWRITE-0}
 OP_TEST_RECREATE=${OP_TEST_RECREATE-0}
 OP_TEST_FORCE_DEPLOY_ON_K8S=${OP_TEST_FORCE_DEPLOY_ON_K8S-0}
 OP_TEST_CI_YAML_ONLY=${OP_TEST_CI_YAML_ONLY-0}
 OP_TEST_UNCOMPLETE="/tmp/operators_uncomplete-localhost.yaml"
-OP_TEST_MIRROR_LATEST_TAG=${OP_TEST_MIRROR_LATEST_TAG-"v4.6"}
 DELETE_APPREG=${DELETE_APPREG-0}
 OP_TEST_DEPLOY_LONGER=${OP_TEST_DEPLOY_LONGER-0}
 
@@ -334,9 +334,15 @@ function ExecParameters() {
     [[ $1 == orange* ]] && [[ $1 != orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e stream_kind=openshift_upstream"
     [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e stream_kind=openshift_upstream -e supported_cluster_versions=${1/orange_/} -e bundle_index_image_version=${1/orange_/}"
     [[ $1 == lemon_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e stream_kind=openshift_upstream -e supported_cluster_versions=${1/lemon_/} -e bundle_index_image_version=${1/lemon_/}"
-    [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && [[ $OP_TEST_PROD -eq 1 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e mirror_multiarch_image=registry.redhat.io/openshift4/ose-operator-registry:v4.5 -e mirror_apply=true"
-    [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_MIRROR_LATEST_TAG" != "${1/orange_/}" ]&& OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e mirror_index_images=\"quay.io/redhat/redhat----community-operator-index:${1/orange_/}|redhat+iib_community|$QUAY_RH_INDEX_PW|$OP_TEST_MIRROR_IMAGE_POSTFIX\""
-    [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_MIRROR_LATEST_TAG" = "${1/orange_/}" ] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e mirror_index_images=\"quay.io/redhat/redhat----community-operator-index:${1/orange_/}|redhat+iib_community|$QUAY_RH_INDEX_PW|$OP_TEST_MIRROR_IMAGE_POSTFIX|quay.io/redhat/redhat----community-operator-index:latest\""
+
+    if [[ $OP_TEST_INDEX_MIRROR -eq 1 ]];then
+        [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && [[ $OP_TEST_PROD -eq 1 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e mirror_multiarch_image=registry.redhat.io/openshift4/ose-operator-registry:v4.5 -e mirror_apply=true"
+        [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_MIRROR_LATEST_TAG" != "${1/orange_/}" ]&& OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e mirror_index_images=\"quay.io/redhat/redhat----community-operator-index:${1/orange_/}|redhat+iib_community|$QUAY_RH_INDEX_PW|$OP_TEST_MIRROR_IMAGE_POSTFIX\""
+        [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_MIRROR_LATEST_TAG" = "${1/orange_/}" ] && OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e mirror_index_images=\"quay.io/redhat/redhat----community-operator-index:${1/orange_/}|redhat+iib_community|$QUAY_RH_INDEX_PW|$OP_TEST_MIRROR_IMAGE_POSTFIX|quay.io/redhat/redhat----community-operator-index:latest\""
+    else
+        [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && [[ $OP_TEST_PROD -eq 1 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e sis_index_add_skip=true"    
+    fi
+
     [[ OP_ALLOW_BIG_CHANGES_TO_EXISTING -eq 1 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e allow_big_changes_to_existing=true"
 
     # Failing test when upstream and orgage_<version> (not supported yet)
