@@ -14,7 +14,7 @@ OP_TEST_CONTAINER_RUN_EXTRA_ARGS=${OP_TEST_CONTAINER_RUN_EXTRA_ARGS-""}
 OP_TEST_EXEC_USER=${OP_TEST_EXEC_USER-""}
 OP_TEST_EXEC_USER_SECRETS=${OP_TEST_EXEC_USER_SECRETS-""}
 OP_TEST_EXEC_BASE=${OP_TEST_EXEC_BASE-"ansible-playbook -i localhost, -e ansible_connection=local upstream/local.yml -e run_upstream=true -e image_protocol='docker://'"}
-OP_TEST_EXEC_EXTRA=${OP_TEST_EXEC_EXTRA-"--tags sync_index_sha -e container_tool=podman"}
+OP_TEST_EXEC_EXTRA=${OP_TEST_EXEC_EXTRA-"-e container_tool=podman --tags sync_index_sha"}
 OP_TEST_INDEX_POSTFIX=${OP_TEST_INDEX_POSTFIX-"s"}
 OP_TEST_ANSIBLE_PULL_REPO=${OP_TEST_ANSIBLE_PULL_REPO-"https://github.com/operator-framework/operator-test-playbooks"}
 OP_TEST_ANSIBLE_PULL_BRANCH=${OP_TEST_ANSIBLE_PULL_BRANCH-"master"}
@@ -57,9 +57,10 @@ if [ "$1" == "kubernetes" ];then
   OP_TEST_EXEC_USER_SECRETS="-e quay_api_token=$QUAY_API_TOKEN_OPERATORHUBIO"
 elif [ "$1" == "openshift" ];then
   OP_TEST_EXEC_USER="-e sis_index_image_input=quay.io/openshift-community-operators/catalog:$OP_TEST_INDEX_IMAGE_TAG -e sis_index_image_output=quay.io/openshift-community-operators/catalog:${OP_TEST_INDEX_IMAGE_TAG}${OP_TEST_INDEX_POSTFIX} -e op_base_name=community-operators"
-  OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e mirror_multiarch_image=registry.redhat.io/openshift4/ose-operator-registry:v4.5 -e mirror_apply=true"
+  OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e mirror_multiarch_image=registry.redhat.io/openshift4/ose-operator-registry:v4.5 -e mirror_apply=true -e bundle_index_image=quay.io/openshift-community-operators/catalog:${OP_TEST_INDEX_IMAGE_TAG}${OP_TEST_INDEX_POSTFIX}"
   OP_TEST_EXEC_USER_SECRETS="-e quay_api_token=$QUAY_API_TOKEN_OPENSHIFT_COMMUNITY_OP"
   OP_TEST_EXEC_USER_SECRETS="$OP_TEST_EXEC_USER_SECRETS -e mirror_index_images=\"quay.io/redhat/redhat----community-operator-index:${OP_TEST_INDEX_IMAGE_TAG}|redhat+iib_community|$QUAY_RH_INDEX_PW|$OP_TEST_MIRROR_IMAGE_POSTFIX\""
+  OP_TEST_EXEC_EXTRA="$OP_TEST_EXEC_EXTRA,mirror_index"
 else
   echo "Only supported input is 'kubernetes' or 'openshift'"
   exit 1
@@ -68,4 +69,6 @@ fi
 
 $OP_TEST_CONTAINER_TOOL run -d --rm $OP_TEST_CONTAINER_OPT --name $OP_TEST_NAME $OP_TEST_CONAINER_RUN_DEFAULT_ARGS $OP_TEST_CONTAINER_RUN_EXTRA_ARGS $OP_TEST_IMAGE
 [ "$1" == "openshift" ] && iib_install
+
+echo "$OP_TEST_EXEC_BASE $OP_TEST_EXEC_EXTRA $OP_TEST_EXEC_USER"
 $OP_TEST_CONTAINER_TOOL exec $OP_TEST_CONTAINER_OPT $OP_TEST_NAME /bin/bash -c "$OP_TEST_EXEC_BASE $OP_TEST_EXEC_EXTRA $OP_TEST_EXEC_USER $OP_TEST_EXEC_USER_SECRETS"
