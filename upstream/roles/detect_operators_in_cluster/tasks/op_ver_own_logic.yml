@@ -9,7 +9,7 @@
     ovol_appreg_supported: false
     ocp_range_start_old: "0"
 
-- name: "Run only if ocp version found in annotations/Dockerfile"
+- name: "Run only if ocp version found in annotations"
   block:
 
     - debug:
