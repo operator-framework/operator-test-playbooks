@@ -38,4 +38,12 @@
     debug:
       var: chi_git_not_index_operators_not_needed
 
+  - name: "Fail playbook repo test"
+    fail:
+      msg: "Want to see {{ playbook_repo_test_want_operator_filtered_out }} in 'chi_git_not_index_operators_not_needed'"
+    when:
+      - playbook_repo_test_want_operator_filtered_out is defined
+      - playbook_repo_test_want_operator_filtered_out != ""
+      - playbook_repo_test_want_operator_filtered_out is not in chi_git_not_index_operators_not_needed
+
   when: cic_stream is match("community-operators")

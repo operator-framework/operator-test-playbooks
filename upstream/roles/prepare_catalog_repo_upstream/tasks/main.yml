@@ -18,7 +18,7 @@
         dest: "{{ catalog_repo_dir }}"
         version: "{{ catalog_repo_branch }}"
         force: true
-#      when: not operator_dir_st.stat.exists
+      when: not operator_dir_st.stat.exists
 
     - name: "Handle removing operators"
       block:
