@@ -9,6 +9,8 @@ TESTS=${TESTS//,/ }
 OP_SCRIPT_URL=${OP_SCRIPT_URL-"https://cutt.ly/WhkV76k"}
 
 OP_TEST_BASE_DEP="ansible curl openssl git"
+KIND_KUBE_VERSION=${KIND_KUBE_VERSION-"v1.21.1"}
+
 
 INDEX_SAFETY="-e enable_production=true"
 POD_START_RETRIES_LONG_DEPLOYMENT_WAIT_RETRIES=300
@@ -472,7 +474,7 @@ for t in $TESTS;do
     echo -e "Test '$t' for '$OP_TEST_STREAM $OP_TEST_OPERATOR $OP_TEST_VERSION' ..."
     if [[ $OP_TEST_RESET -eq 1 ]];then
         echo -e "[$t] Reseting kind cluster ..."
-        run $DRY_RUN_CMD ansible-pull -U $OP_TEST_ANSIBLE_PULL_REPO -C $OP_TEST_ANSIBLE_PULL_BRANCH $OP_TEST_ANSIBLE_DEFAULT_ARGS -e run_prepare_catalog_repo_upstream=false --tags reset
+        run $DRY_RUN_CMD ansible-pull -U $OP_TEST_ANSIBLE_PULL_REPO -C $OP_TEST_ANSIBLE_PULL_BRANCH $OP_TEST_ANSIBLE_DEFAULT_ARGS -e run_prepare_catalog_repo_upstream=false -e kind_kube_version=$KIND_KUBE_VERSION --tags reset
     fi
     if [ -n "$OP_TEST_PRETEST_CUSTOM_SCRIPT" ];then
         echo "Running custom script '$OP_TEST_PRETEST_CUSTOM_SCRIPT' ..."
