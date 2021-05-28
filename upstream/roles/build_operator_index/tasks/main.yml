@@ -224,8 +224,8 @@
   ignore_errors: yes
   register: boi_ia_rc
   when: bundle_images != ""
-  environment:
-    GODEBUG=x509ignoreCN=0
+  # environment:
+  #   GODEBUG: x509ignoreCN=0
 
 - name: "Index safety check to avoid accidental overwrite"
   include_role:

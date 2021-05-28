@@ -2,8 +2,8 @@
 
 name: Build playbook image
 
-env:
-  GODEBUG: "x509ignoreCN=0"
+# env:
+#   GODEBUG: "x509ignoreCN=0"
 
 # Controls when the action will run.
 on:

@@ -16,7 +16,7 @@
     olm_version: 0.14.1
   environment:
     PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.local/bin"
-    when: run_upstream|bool
+    # GODEBUG: "x509ignoreCN=0"
 
   pre_tasks:
     - setup:
