@@ -118,7 +118,7 @@
     - name: "Override 'dov_cluster_ver'"
       set_fact:
         dov_cluster_ver: "v{{ current_openshift_run }}"
-      when: current_openshift_run is not defined
+      when: current_openshift_run is defined
 
     - name: "Define dov_cluster_ver_extended_by_pyxis"
       set_fact:
