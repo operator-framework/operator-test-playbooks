@@ -581,6 +581,10 @@
   register: debug_output_time_general
   ignore_errors: true
 
+- name: "Cleanup created resources on the KIND cluster"
+  include_role:
+    name: cleanup_operator_resources
+
 - fail:
     msg: 'Operator deployment with OLM failed, expand log and check logs from the bottom to the top ^'
   when: operator_result.rc != 0
