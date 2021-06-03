@@ -171,6 +171,7 @@
     operator_ownnamespace_support: "{{ false if operator_ownnamespace_support == [] else operator_ownnamespace_support[0] }}"
     operator_singlenamespace_support: "{{ false if operator_singlenamespace_support == [] else operator_singlenamespace_support[0] }}"
     operator_multinamespace_support: "{{ false if operator_multinamespace_support == [] else operator_multinamespace_support[0] }}"
+    olm_operator_files_path_core: "{{ olm_operator_files_path }}"
 
 - name: "Create the olm operator files directory"
   file:
@@ -586,6 +587,9 @@
   shell: "{{ oc_bin_path }} get pods -n {{ openshift_namespace }}"
   register: debug_output_time_general
   ignore_errors: true
+
+- set_fact:
+    olm_operator_files_path: "{{ olm_operator_files_path_core }}"
 
 - name: "Cleanup created resources on the KIND cluster"
   include_role:
