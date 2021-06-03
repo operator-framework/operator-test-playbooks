@@ -47,6 +47,11 @@
   debug:
     var: olm_version_output
 
+- name: "Check that yq exists"
+  stat:
+    path: "{{ yq_bin_path }}"
+  register: yq_file_existence
+
 - name: "Download yq ({{ yq_version }})"
   get_url:
     url: "https://github.com/mikefarah/yq/releases/download/{{ yq_version }}/yq_linux_amd64"
@@ -57,6 +62,7 @@
   retries: 10
   delay: 15
   failed_when: yq_install_result is failure
+  when: not yq_file_existence.stat.exists
 
 - name: "Detect format"
   include_role:
@@ -584,6 +590,11 @@
 - name: "Cleanup created resources on the KIND cluster"
   include_role:
     name: cleanup_operator_resources
+
+- name: "Delete testimagepull"
+  shell: "{{ oc_bin_path }} delete namespace testimagepull"
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
 
 - fail:
     msg: 'Operator deployment with OLM failed, expand log and check logs from the bottom to the top ^'
