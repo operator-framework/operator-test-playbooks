@@ -118,7 +118,9 @@
     - name: "Override 'dov_cluster_ver'"
       set_fact:
         dov_cluster_ver: "v{{ current_openshift_run }}"
-      when: current_openshift_run is defined
+      when:
+        - current_openshift_run is defined
+        - current_openshift_run !=""
 
     - name: "Define dov_cluster_ver_extended_by_pyxis"
       set_fact:
@@ -139,6 +141,7 @@
         - meta: end_play
       when:
         - current_openshift_run is defined
+        - current_openshift_run !=""
         - dov_cluster_ver_extended_by_pyxis not in doic_supported_indexes_json_list
 
     when:
