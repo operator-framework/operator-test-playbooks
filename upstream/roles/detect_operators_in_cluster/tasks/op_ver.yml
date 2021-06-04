@@ -98,21 +98,21 @@
 
   - name: "Data has some content"
     block:
-      block:
-      - name: "Reset list of supported OCPs"
-        set_fact:
-          doic_supported_indexes_json_list: []
+    - block:
+          - name: "Reset list of supported OCPs"
+            set_fact:
+              doic_supported_indexes_json_list: []
 
-      - name: "Loop over"
-        set_fact:
-          doic_supported_indexes_json_list: "{{ doic_supported_indexes_json_list | default([]) + [doic_supported_index_json_data_loop.path] }}"
-        loop: "{{ doic_supported_indexes_json.data }}"
-        loop_control:
-          loop_var: doic_supported_index_json_data_loop
+          - name: "Loop over"
+            set_fact:
+              doic_supported_indexes_json_list: "{{ doic_supported_indexes_json_list | default([]) + [doic_supported_index_json_data_loop.path] }}"
+            loop: "{{ doic_supported_indexes_json.data }}"
+            loop_control:
+              loop_var: doic_supported_index_json_data_loop
 
-      - name: "Create chi_git_not_index_operators_not_needed line"
-        set_fact:
-          chi_git_not_index_operators_not_needed_line: "{{ dov_op_name }}:v{{ doic_versions_processing }}"
+          - name: "Create chi_git_not_index_operators_not_needed line"
+            set_fact:
+              chi_git_not_index_operators_not_needed_line: "{{ dov_op_name }}:v{{ doic_versions_processing }}"
       when: current_openshift_run is not defined
 
     - name: "Debug"
