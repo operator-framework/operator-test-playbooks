@@ -1,4 +1,10 @@
 ---
+- name: "Run clean_list - detect if 4.5 is supported"
+  include_role:
+    name: detect_operators_in_cluster
+    tasks_from: op_ver.yml
+#  vars:
+
 - name: "Set OLM namespace to check"
   set_fact:
     olm_namespace_check: "openshift-operator-lifecycle-manager"
