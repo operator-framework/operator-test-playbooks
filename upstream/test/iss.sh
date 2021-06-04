@@ -19,7 +19,7 @@ OP_TEST_INDEX_POSTFIX=${OP_TEST_INDEX_POSTFIX-"s"}
 OP_TEST_ANSIBLE_PULL_REPO=${OP_TEST_ANSIBLE_PULL_REPO-"https://github.com/operator-framework/operator-test-playbooks"}
 OP_TEST_ANSIBLE_PULL_BRANCH=${OP_TEST_ANSIBLE_PULL_BRANCH-"master"}
 OP_TEST_ANSIBLE_DEFAULT_ARGS=${OP_TEST_ANSIBLE_DEFAULT_ARGS-"-i localhost, -e ansible_connection=local -e run_upstream=true -e run_remove_catalog_repo=false upstream/local.yml"}
-IIB_INPUT_REGISTRY_USER=${IIB_INPUT_REGISTRY_USER-"mvalahtv"}
+IIB_INPUT_REGISTRY_USER=${IIB_INPUT_REGISTRY_USER-"mavala"}
 IIB_OUTPUT_REGISTRY_USER=${IIB_OUTPUT_REGISTRY_USER-"redhat+iib_community"}
 #$OP_TEST_CONTAINER_TOOL rm -f $OP_TEST_NAME > /dev/null 2>&1
 OP_TEST_MIRROR_LATEST_TAG=${OP_TEST_MIRROR_LATEST_TAG-"v4.6"}
