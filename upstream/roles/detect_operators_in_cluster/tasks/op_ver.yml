@@ -56,7 +56,7 @@
       - (skopeo_inspect_json.Labels['com.redhat.openshift.versions'] is not defined) or (skopeo_inspect_json.Labels['com.redhat.openshift.versions']== "")
   #do not run for clean_index_check in check_index, run only for release in deploy_bundles
   when:
-    - (clean_index_check is not defined or not clean_index_check|bool) or (current_openshift_run in not defined)
+    - ((clean_index_check is not defined) or (not clean_index_check|bool)) or (current_openshift_run in not defined)
 
 - name: "Cluster version defined on label"
   block:
