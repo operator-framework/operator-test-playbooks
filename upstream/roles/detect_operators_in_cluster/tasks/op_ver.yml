@@ -1,5 +1,8 @@
 ---
 #3
+- name: "Debug"
+  debug:
+    var: current_openshift_run
 - name: "Default standard detection"
   block:
   - name: "Reset range start"
