@@ -115,6 +115,10 @@
           chi_git_not_index_operators_not_needed_line: "{{ dov_op_name }}:v{{ doic_versions_processing }}"
       when: current_openshift_run is not defined
 
+    - name: "Debug"
+      debug:
+        var: current_openshift_run
+
     - name: "Override 'dov_cluster_ver'"
       set_fact:
         dov_cluster_ver: "v{{ current_openshift_run }}"
