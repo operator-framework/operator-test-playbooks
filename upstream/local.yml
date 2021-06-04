@@ -58,7 +58,7 @@
       set_fact:
         dc_changes_allowed:
           - spec.description
-          - spec.DisplayName
+          - spec.displayName
           - spec.icon
           - metadata.annotations.description
           - metadata.annotations.alm-examples
