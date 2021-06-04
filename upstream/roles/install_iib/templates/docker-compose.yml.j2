@@ -91,6 +91,7 @@ services:
       IIB_DEV: 'true'
       REQUESTS_CA_BUNDLE: /etc/pki/tls/certs/ca-bundle.crt
       BUILDAH_FORMAT: docker
+      GODEBUG: x509ignoreCN=0
     # Make this privileged to be able to build container images
     privileged: true
     volumes:
