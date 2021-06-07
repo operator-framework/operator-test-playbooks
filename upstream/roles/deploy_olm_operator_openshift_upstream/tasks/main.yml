@@ -1,10 +1,4 @@
 ---
-- name: "Check if deploy is needed"
-  include_role:
-    name: detect_operators_in_cluster
-    tasks_from: op_ver.yml
-#  vars:
-
 - name: "Set OLM namespace to check"
   set_fact:
     olm_namespace_check: "openshift-operator-lifecycle-manager"
@@ -20,6 +14,15 @@
     path: "/tmp/oc-{{ dir_suffix_part }}/bin"
     state: directory
     mode: '0755'
+
+- name: "Set work_dir"
+  set_fact:
+    work_dir: "/tmp/oc-{{ dir_suffix_part }}"
+- name: "Check if deploy is needed"
+  include_role:
+    name: detect_operators_in_cluster
+    tasks_from: op_ver.yml
+#  vars:
 
 - name: "Download oc"
   shell: "curl https://mirror.openshift.com/pub/openshift-v4/clients/oc/{{ oc_version_test }}/linux/oc.tar.gz | tar xvzf - -C /tmp/oc-{{ dir_suffix_part }}/bin oc --skip-old-files"
