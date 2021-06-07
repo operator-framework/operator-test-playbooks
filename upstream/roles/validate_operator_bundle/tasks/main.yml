@@ -68,27 +68,8 @@
         - operator_sdk_container_tool is defined
         - operator_sdk_container_tool == "none"
 
-    - name: "Reset bundle dockerfile arg variable"
-      set_fact:
-        operator_sdk_validate_bundle_dockerfile_arg: ""
-
-    # - name: "Handle operator-sdk bundle validate dockerfile argument"
-    #   block:
-    #     - name: "Check if csv file exists"
-    #       stat:
-    #         path: "{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/Dockerfile"
-    #       register: bundle_dockerfile_st
-
-    #     - name: "Add bundle dockerfile argument - '{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/Dockerfile'"
-    #       set_fact:
-    #         operator_sdk_validate_bundle_dockerfile_arg: "--optional-values=index-path={{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/Dockerfile"
-    #       when: bundle_dockerfile_st.stat.exists
-    #   when:
-    #     - operator_sdk_container_tool is undefined or operator_sdk_container_tool != "none"
-    #     # - (stream_kind is defined and stream_kind == "openshift_upstream")
-
     - name: "Validate the operator bundle manifest and metadata with operator-sdk bundle validate from image {{ bundle_image }}"
-      shell: "OPERATOR_BUNDLE_CATEGORIES={{ catalog_repo_dir }}/categories.json {{ operator_sdk_bin_path }} bundle validate --verbose {{ bundle_image }} -b {{ operator_sdk_container_tool }} {{ operator_sdk_validate_bundle_dockerfile_arg }} {{ operator_sdk_validate_extra_args }}"
+      shell: "OPERATOR_BUNDLE_CATEGORIES={{ catalog_repo_dir }}/categories.json {{ operator_sdk_bin_path }} bundle validate --verbose {{ bundle_image }} -b {{ operator_sdk_container_tool }} {{ operator_sdk_validate_extra_args }}"
       register: sdk_validation_upstream_result
       ignore_errors: true
 
