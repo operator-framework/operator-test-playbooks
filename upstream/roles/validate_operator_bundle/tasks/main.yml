@@ -68,6 +68,10 @@
         - operator_sdk_container_tool is defined
         - operator_sdk_container_tool == "none"
 
+    - name: "Add bundle dockerfile argument - '{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/Dockerfile'"
+      set_fact:
+        operator_sdk_validate_bundle_dockerfile_arg: ""
+
     - name: "Handle operator-sdk bundle validate dockerfile argument"
       block:
         - name: "Check if csv file exists"
