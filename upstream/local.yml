@@ -34,7 +34,7 @@
     offline_cataloger_bin_path: "offline-cataloger"
     kind_version: v0.9.0
     kind_kube_version: v1.21.1
-    operator_sdk_version: v1.3.0
+    operator_sdk_version: v1.8.0
     operator_courier_version: 2.1.11
     olm_version: 0.17.0
     opm_version: v1.17.0
@@ -46,7 +46,6 @@
 
   environment:
     PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.local/bin"
-    # GODEBUG: "x509ignoreCN=0"
 
   pre_tasks:
     - setup:
@@ -83,7 +82,6 @@
         operator_format: "bundle"
         check_verify_result: "{{ check_verify_result | default(true) }}"
         operator_suggested_namespace_default: test-operators
-#        operator_sdk_version: v1.3.0
 
       tags:
         - always
@@ -130,6 +128,8 @@
         supported_cluster_versions: "v4.6,v4.7,v4.8"
         supported_cluster_version_latest: "v4.6"
         use_cluster_filter: true
+        operator_sdk_validate_extra_args: "--select-optional suite=operatorframework"
+        # operator_sdk_validate_extra_args: "--select-optional suite=operatorframeworkd --select-optional name=community"
       when: (stream_kind is defined and stream_kind == "openshift_upstream")
       tags:
         - always

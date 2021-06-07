@@ -59,7 +59,7 @@
         - sdk_validation_result.rc != 0
   when: not run_upstream|bool
 
-- name: "Handle manifest and metadata validation for Kind"
+- name: "Checking validation of operator bundle"
   block:
 
     - name: "Pull index image '{{ bundle_image }}' (operator_sdk_none fix)"
@@ -69,7 +69,7 @@
         - operator_sdk_container_tool == "none"
 
     - name: "Validate the operator bundle manifest and metadata with operator-sdk bundle validate from image {{ bundle_image }}"
-      shell: "OPERATOR_BUNDLE_CATEGORIES={{ catalog_repo_dir }}/categories.json {{ operator_sdk_bin_path }} bundle validate --verbose {{ bundle_image }} -b {{ operator_sdk_container_tool }}  --select-optional suite=operatorframework"
+      shell: "OPERATOR_BUNDLE_CATEGORIES={{ catalog_repo_dir }}/categories.json {{ operator_sdk_bin_path }} bundle validate --verbose {{ bundle_image }} -b {{ operator_sdk_container_tool }} {{ operator_sdk_validate_extra_args }}"
       register: sdk_validation_upstream_result
       ignore_errors: true
 
