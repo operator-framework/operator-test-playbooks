@@ -1,10 +1,4 @@
 ---
-- name: "Check if deploy is needed"
-  include_role:
-    name: detect_operators_in_cluster
-    tasks_from: op_ver.yml
-#  vars:
-
 - name: "Set OLM namespace to check"
   set_fact:
     olm_namespace_check: "openshift-operator-lifecycle-manager"
@@ -53,11 +47,6 @@
   debug:
     var: olm_version_output
 
-- name: "Check that yq exists"
-  stat:
-    path: "{{ yq_bin_path }}"
-  register: yq_file_existence
-
 - name: "Download yq ({{ yq_version }})"
   get_url:
     url: "https://github.com/mikefarah/yq/releases/download/{{ yq_version }}/yq_linux_amd64"
@@ -68,7 +57,6 @@
   retries: 10
   delay: 15
   failed_when: yq_install_result is failure
-  when: not yq_file_existence.stat.exists
 
 - name: "Detect format"
   include_role:
@@ -177,7 +165,6 @@
     operator_ownnamespace_support: "{{ false if operator_ownnamespace_support == [] else operator_ownnamespace_support[0] }}"
     operator_singlenamespace_support: "{{ false if operator_singlenamespace_support == [] else operator_singlenamespace_support[0] }}"
     operator_multinamespace_support: "{{ false if operator_multinamespace_support == [] else operator_multinamespace_support[0] }}"
-    olm_operator_files_path_core: "{{ olm_operator_files_path }}"
 
 - name: "Create the olm operator files directory"
   file:
@@ -593,18 +580,6 @@
   shell: "{{ oc_bin_path }} get pods -n {{ openshift_namespace }}"
   register: debug_output_time_general
   ignore_errors: true
-
-- set_fact:
-    olm_operator_files_path: "{{ olm_operator_files_path_core }}"
-
-- name: "Cleanup created resources on the KIND cluster"
-  include_role:
-    name: cleanup_operator_resources
-
-- name: "Delete testimagepull"
-  shell: "{{ oc_bin_path }} delete namespace testimagepull"
-  environment:
-    KUBECONFIG: "{{ kubeconfig_path }}"
 
 - fail:
     msg: 'Operator deployment with OLM failed, expand log and check logs from the bottom to the top ^'
