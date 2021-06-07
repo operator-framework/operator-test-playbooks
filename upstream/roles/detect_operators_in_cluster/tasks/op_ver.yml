@@ -1,48 +1,59 @@
 ---
 #3
+- name: "Debug"
+  debug:
+    var: current_openshift_run
 - name: "Default standard detection"
   block:
-  - name: "Reset range start"
-    set_fact:
-      ocp_range_start_old: "0"
+    - name: "Reset range start"
+      set_fact:
+        ocp_range_start_old: "0"
+        doic_versions_from_bundle: "{{ lc_doic_bundles_processing.split(':v')[1] }}"
+      when: current_openshift_run is not defined
 
-  - name: "Disable annotation check during the next parse"
-    set_fact:
-       doic_skip_file_check: true
-       bundle_sanity_checks: true
-       doic_versions_from_bundle: "{{ lc_doic_bundles_processing.split(':v')[1] }}"
-       ocp_version_annotation_stdout: "NotFound"
+    - name: "Disable annotation check during the next parse"
+      set_fact:
+         doic_skip_file_check: true
+         bundle_sanity_checks: true
+         ocp_version_annotation_stdout: "NotFound"
 
-  - name: "Parse the operator bundle image, manifest and metadata"
-    include_role:
-      name: parse_operator_bundle
-    vars:
-      bundle_image: "{{ lc_doic_bundles_processing }}"
-    when: lc_doic_bundles_processing.startswith('kind-registry')
+    - name: "Set bundle image in case of ci-operator-label-handler activated by current_openshift_run"
+      set_fact:
+         lc_doic_bundles_processing: "quay.io/operator_testing/{{ package_name }}:{{ commit_tag }}"
+      when:
+        - current_openshift_run is defined
+        - current_openshift_run != ""
 
-  - name: "Parse the operator bundle image, manifest and metadata"
-    include_role:
-      name: parse_operator_bundle
-    vars:
-      bundle_image: "{{ lc_doic_bundles_processing }}"
-      image_protocol: "docker://"
-    when: not lc_doic_bundles_processing.startswith('kind-registry')
+    - name: "Parse the operator bundle image, manifest and metadata"
+      include_role:
+        name: parse_operator_bundle
+      vars:
+        bundle_image: "{{ lc_doic_bundles_processing }}"
+      when: lc_doic_bundles_processing.startswith('kind-registry')
 
-  - name: "Set check back"
-    set_fact:
-       doic_skip_file_check: false
+    - name: "Parse the operator bundle image, manifest and metadata"
+      include_role:
+        name: parse_operator_bundle
+      vars:
+        bundle_image: "{{ lc_doic_bundles_processing }}"
+        image_protocol: "docker://"
+      when: not lc_doic_bundles_processing.startswith('kind-registry')
 
-  - name: "Set cluster version from bundle label"
-    set_fact:
-       ocp_version_annotation_stdout: "{{ skopeo_inspect_json.Labels['com.redhat.openshift.versions'] }}"
-    when:
-      - skopeo_inspect_json.Labels['com.redhat.openshift.versions'] is defined
-      - skopeo_inspect_json.Labels['com.redhat.openshift.versions']!= ""
+    - name: "Set check back"
+      set_fact:
+         doic_skip_file_check: false
 
-  - name: "No cluster version defined on label, version is supported."
-    include_tasks: version_found.yml
-    when:
-      - (skopeo_inspect_json.Labels['com.redhat.openshift.versions'] is not defined) or (skopeo_inspect_json.Labels['com.redhat.openshift.versions']== "")
+    - name: "Set cluster version from bundle label"
+      set_fact:
+         ocp_version_annotation_stdout: "{{ skopeo_inspect_json.Labels['com.redhat.openshift.versions'] }}"
+      when:
+        - skopeo_inspect_json.Labels['com.redhat.openshift.versions'] is defined
+        - skopeo_inspect_json.Labels['com.redhat.openshift.versions']!= ""
+
+    - name: "No cluster version defined on label, version is supported."
+      include_tasks: version_found.yml
+      when:
+        - (skopeo_inspect_json.Labels['com.redhat.openshift.versions'] is not defined) or (skopeo_inspect_json.Labels['com.redhat.openshift.versions']== "")
   #do not run for clean_index_check in check_index, run only for release in deploy_bundles
   when:
     - clean_index_check is not defined or not clean_index_check|bool
@@ -70,45 +81,71 @@
       - doic_supported_indexes is defined
       - doic_supported_indexes != ""
 
-  - name: "Data is empty"
+  - block:
+    - name: "Data is empty"
+      block:
+
+        - name: "Create chi_git_not_index_operators_not_needed line"
+          set_fact:
+            chi_git_not_index_operators_not_needed_line: "{{ dov_op_name }}:v{{ doic_versions_processing }}"
+
+        - name: "Pyxis returns empty value means suitable for exclude"
+          set_fact:
+           chi_git_not_index_operators_not_needed: "{{ chi_git_not_index_operators_not_needed | default([]) + [chi_git_not_index_operators_not_needed_line] }}"
+
+      when:
+          - clean_index_check is defined and clean_index_check|bool
+          - doic_supported_indexes_json is defined
+          - doic_supported_indexes_json.data|length==0
+    when: current_openshift_run is not defined
+
+  - name: "Data has some content"
     block:
+    - block:
+          - name: "Reset list of supported OCPs"
+            set_fact:
+              doic_supported_indexes_json_list: []
 
-      - name: "Create chi_git_not_index_operators_not_needed line"
-        set_fact:
-          chi_git_not_index_operators_not_needed_line: "{{ dov_op_name }}:v{{ doic_versions_processing }}"
+          - name: "Loop over"
+            set_fact:
+              doic_supported_indexes_json_list: "{{ doic_supported_indexes_json_list | default([]) + [doic_supported_index_json_data_loop.path] }}"
+            loop: "{{ doic_supported_indexes_json.data }}"
+            loop_control:
+              loop_var: doic_supported_index_json_data_loop
 
-      - name: "Pyxis returns empty value means suitable for exclude"
-        set_fact:
-         chi_git_not_index_operators_not_needed: "{{ chi_git_not_index_operators_not_needed | default([]) + [chi_git_not_index_operators_not_needed_line] }}"
+          - name: "Create chi_git_not_index_operators_not_needed line"
+            set_fact:
+              chi_git_not_index_operators_not_needed_line: "{{ dov_op_name }}:v{{ doic_versions_processing }}"
+      when: current_openshift_run is not defined
 
-    when:
-        - clean_index_check is defined and clean_index_check|bool
-        - doic_supported_indexes_json is defined
-        - doic_supported_indexes_json.data|length==0
-
-  - name: "Data has content"
-    block:
-
-    - name: "Reset list of supported OCPs"
+    - name: "Override 'dov_cluster_ver'"
       set_fact:
-        doic_supported_indexes_json_list: []
+        dov_cluster_ver: "v{{ current_openshift_run }}"
+      when:
+        - current_openshift_run is defined
+        - current_openshift_run !=""
 
-    - name: "Loop over"
+    - name: "Define dov_cluster_ver_extended_by_pyxis"
       set_fact:
-        doic_supported_indexes_json_list: "{{ doic_supported_indexes_json_list | default([]) + [doic_supported_index_json_data_loop.path] }}"
-      loop: "{{ doic_supported_indexes_json.data }}"
-      loop_control:
-        loop_var: doic_supported_index_json_data_loop
-
-    - name: "Create chi_git_not_index_operators_not_needed line"
-      set_fact:
-        chi_git_not_index_operators_not_needed_line: "{{ dov_op_name }}:v{{ doic_versions_processing }}"
         dov_cluster_ver_extended_by_pyxis: "{{ doic_supported_indexes_json.data[0].path.split(':')[0] }}:{{ dov_cluster_ver }}"
 
-    - name: "Pyxis entries does not match current {{ dov_cluster_ver }}"
+    - name: "Pyxis entries do not match current {{ dov_cluster_ver }}"
       set_fact:
        chi_git_not_index_operators_not_needed: "{{ chi_git_not_index_operators_not_needed | default([]) + [chi_git_not_index_operators_not_needed_line] }}"
-      when: dov_cluster_ver_extended_by_pyxis not in doic_supported_indexes_json_list
+      when:
+        - current_openshift_run is not defined
+        - dov_cluster_ver_extended_by_pyxis not in doic_supported_indexes_json_list
+
+    - block:
+        - name: "End play as green if current cluster version is not supported. This will be consumed by pipeline as OK. ci-operator-label-handler"
+          debug:
+            msg: "Current cluster version is not supported, nothing to test. Green. "
+
+        - meta: end_play
+      when:
+        - current_openshift_run is defined
+        - current_openshift_run !=""
+        - dov_cluster_ver_extended_by_pyxis not in doic_supported_indexes_json_list
 
     when:
         - clean_index_check is defined and clean_index_check|bool
