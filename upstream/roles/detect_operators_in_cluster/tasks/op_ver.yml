@@ -163,7 +163,7 @@
     when:
       - current_openshift_run is defined
       - current_openshift_run !=""
-      - dov_cluster_ver_extended_by_pyxis not in doic_supported_indexes_json_list
+      - dov_cluster_ver_extended_by_pyxis_for_exit not in doic_supported_indexes_json_list
 
   - name: "Loop over supported indexes"
     include_tasks: match_index.yml
