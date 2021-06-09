@@ -118,13 +118,6 @@
               chi_git_not_index_operators_not_needed_line: "{{ dov_op_name }}:v{{ doic_versions_processing }}"
       when: current_openshift_run is not defined
 
-    - name: "Override 'dov_cluster_ver'"
-      set_fact:
-        dov_cluster_ver: "v{{ current_openshift_run }}"
-      when:
-        - current_openshift_run is defined
-        - current_openshift_run !=""
-
     - name: "Define dov_cluster_ver_extended_by_pyxis"
       set_fact:
         dov_cluster_ver_extended_by_pyxis: "{{ doic_supported_indexes_json.data[0].path.split(':')[0] }}:{{ dov_cluster_ver }}"
@@ -136,17 +129,6 @@
         - current_openshift_run is not defined
         - dov_cluster_ver_extended_by_pyxis not in doic_supported_indexes_json_list
 
-    - block:
-        - name: "End play as green if current cluster version is not supported. This will be consumed by pipeline as OK. ci-operator-label-handler"
-          debug:
-            msg: "Current cluster version is not supported, nothing to test. Green. "
-
-        - meta: end_play
-      when:
-        - current_openshift_run is defined
-        - current_openshift_run !=""
-        - dov_cluster_ver_extended_by_pyxis not in doic_supported_indexes_json_list
-
     when:
         - clean_index_check is defined and clean_index_check|bool
         - doic_supported_indexes_json is defined
@@ -156,6 +138,32 @@
       var: clean_index_check
   - debug:
       var: doic_supported_indexes_json
+
+  - block:
+      - name: "Override 'dov_cluster_ver'"
+        set_fact:
+          dov_cluster_ver: "v{{ current_openshift_run }}"
+        when:
+          - current_openshift_run is defined
+          - current_openshift_run !=""
+
+      - name: "Define dov_cluster_ver_extended_by_pyxis_for_exit"
+        set_fact:
+          dov_cluster_ver_extended_by_pyxis_for_exit: "{{ doic_supported_indexes_json.data[0].path.split(':')[0] }}:{{ dov_cluster_ver }}"
+    when:
+      - current_openshift_run is defined
+      - current_openshift_run !=""
+
+  - block:
+      - name: "End play as green if current cluster version is not supported. This will be consumed by pipeline as OK. ci-operator-label-handler"
+        debug:
+          msg: "Current cluster version is not supported, nothing to test. Green. "
+
+      - meta: end_play
+    when:
+      - current_openshift_run is defined
+      - current_openshift_run !=""
+      - dov_cluster_ver_extended_by_pyxis not in doic_supported_indexes_json_list
 
   - name: "Loop over supported indexes"
     include_tasks: match_index.yml
