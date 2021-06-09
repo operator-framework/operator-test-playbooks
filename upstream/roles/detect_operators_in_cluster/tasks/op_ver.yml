@@ -130,14 +130,9 @@
         - dov_cluster_ver_extended_by_pyxis not in doic_supported_indexes_json_list
 
     when:
-        - clean_index_check is defined and clean_index_check|bool
+        - (clean_index_check is defined and clean_index_check|bool) or (current_openshift_run is defined and current_openshift_run !="")
         - doic_supported_indexes_json is defined
         - doic_supported_indexes_json.data|length!=0
-
-  - debug:
-      var: clean_index_check
-  - debug:
-      var: doic_supported_indexes_json
 
   - block:
       - name: "Override 'dov_cluster_ver'"
