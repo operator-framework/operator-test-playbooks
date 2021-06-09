@@ -152,6 +152,11 @@
         - doic_supported_indexes_json is defined
         - doic_supported_indexes_json.data|length!=0
 
+  - debug:
+      var: clean_index_check
+  - debug:
+      var: doic_supported_indexes_json
+
   - name: "Loop over supported indexes"
     include_tasks: match_index.yml
     loop: "{{ doic_supported_indexes_json.data }}"
