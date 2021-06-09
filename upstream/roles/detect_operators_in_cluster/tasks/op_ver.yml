@@ -121,6 +121,7 @@
     - name: "Define dov_cluster_ver_extended_by_pyxis"
       set_fact:
         dov_cluster_ver_extended_by_pyxis: "{{ doic_supported_indexes_json.data[0].path.split(':')[0] }}:{{ dov_cluster_ver }}"
+      when: current_openshift_run is not defined
 
     - name: "Pyxis entries do not match current {{ dov_cluster_ver }}"
       set_fact:
