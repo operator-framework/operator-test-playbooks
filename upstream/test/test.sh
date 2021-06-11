@@ -18,8 +18,6 @@ OP_TEST_CERT_DIR=${OP_TEST_CERT_DIR-"$HOME/.optest/certs"}
 OP_TEST_CONTAINER_TOOL=${OP_TEST_CONTAINER_TOOL-"docker"}
 OP_TEST_CONTAINER_OPT=${OP_TEST_CONTAINER_OPT-"-it"}
 OP_TEST_NAME=${OPT_TEST_NAME-"op-test"}
-# OP_TEST_ANSIBLE_PULL_REPO=${OP_TEST_ANSIBLE_PULL_REPO-"https://github.com/redhat-operator-ecosystem/operator-test-playbooks"}
-# OP_TEST_ANSIBLE_PULL_BRANCH=${OP_TEST_ANSIBLE_PULL_BRANCH-"upstream-community"}
 OP_TEST_ANSIBLE_PULL_REPO=${OP_TEST_ANSIBLE_PULL_REPO-"https://github.com/operator-framework/operator-test-playbooks"}
 OP_TEST_ANSIBLE_PULL_BRANCH=${OP_TEST_ANSIBLE_PULL_BRANCH-"master"}
 OP_TEST_ANSIBLE_DEFAULT_ARGS=${OP_TEST_ANSIBLE_DEFAULT_ARGS-"-i localhost, -e ansible_connection=local -e run_upstream=true -e run_remove_catalog_repo=false upstream/local.yml"}
@@ -30,7 +28,6 @@ OP_TEST_CONTAINER_EXEC_DEFAULT_ARGS=${OP_TEST_CONTAINER_EXEC_DEFAULT_ARGS-""}
 OP_TEST_CONTAINER_EXEC_EXTRA_ARGS=${OP_TEST_CONTAINER_EXEC_EXTRA_ARGS-""}
 OP_TEST_EXEC_BASE=${OP_TEST_EXEC_BASE-"ansible-playbook -i localhost, -e ansible_connection=local upstream/local.yml -e run_upstream=true -e image_protocol='docker://'"}
 OP_TEST_EXEC_EXTRA=${OP_TEST_EXEC_EXTRA-"-e container_tool=podman"}
-# OP_TEST_EXEC_EXTRA=${OP_TEST_EXEC_EXTRA-""}
 OP_TEST_RUN_MODE=${OP_TEST_RUN_MODE-"privileged"}
 OP_TEST_LABELS=${OP_TEST_LABELS-""}
 OP_TEST_PROD=${OP_TEST_PROD-0}
@@ -158,8 +155,6 @@ function run() {
 
 [ "$OP_TEST_RUN_MODE" = "privileged" ] && OP_TEST_CONAINER_RUN_DEFAULT_ARGS="--privileged --net host -v $OP_TEST_CERT_DIR:/usr/share/pki/ca-trust-source/anchors -e STORAGE_DRIVER=vfs -e BUILDAH_FORMAT=docker"
 [ "$OP_TEST_RUN_MODE" = "user" ] && OP_TEST_CONAINER_RUN_DEFAULT_ARGS="--net host -v $OP_TEST_CERT_DIR:/usr/share/pki/ca-trust-source/anchors -e STORAGE_DRIVER=vfs -e BUILDAH_FORMAT=docker"
-
-# OP_TEST_EXEC_USER="-e operator_dir=/tmp/community-operators-for-catalog/upstream-community-operators/aqua -e operator_version=1.0.2 --tags pure_test"
 
 checkExecutable $OP_TEST_BASE_DEP
 
@@ -297,11 +292,8 @@ function ExecParameters() {
     [[ $1 == kiwi* ]] && [[ $OP_TEST_DEPLOY_LONGER -eq 1 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e pod_start_retries=$POD_START_RETRIES_LONG_DEPLOYMENT_WAIT_RETRIES"
     [[ $1 == lemon* ]] && OP_TEST_EXEC_USER="-e operator_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR --tags deploy_bundles"
     [[ $1 == orange* ]] && [ "$OP_TEST_VERSION" != "sync" ] && OP_TEST_EXEC_USER="-e operator_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM/$OP_TEST_OPERATOR --tags deploy_bundles"
-    # [[ $1 == orange* ]] && [ "$OP_TEST_VERSION" = "update" ] && [[ $OP_TEST_PROD -ge 1 ]] && [[ $OP_TEST_RECREATE -eq 1 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER,remove_operator"
     [[ $1 == orange* ]] &&  [ "$OP_TEST_VERSION" = "sync" ] && OP_TEST_EXEC_USER="--tags deploy_bundles"
-    # [[ $1 == orange_* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER,iib"
 
-    ## TODO check if needed for sync in prod
     [[ $1 == orange* ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && [ "$OP_TEST_VERSION" != "sync" ] && [[ $OP_TEST_PROD -lt 2 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e production_registry_namespace=quay.io/openshift-community-operators"
     [[ $1 == orange* ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && [ "$OP_TEST_VERSION" != "sync" ] && [[ $OP_TEST_PROD -lt 2 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e production_registry_namespace=quay.io/operatorhubio"
 
@@ -314,13 +306,8 @@ function ExecParameters() {
     [[ $1 == orange* ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && [[ $OP_TEST_PROD -ge 2 ]] && OP_TEST_EXEC_USER_INDEX_CHECK="-e run_prepare_catalog_repo_upstream=true -e bundle_index_image=quay.io/operator_testing/catalog:latest -e operator_base_dir=$OP_TEST_BASE_DIR/$OP_TEST_STREAM"
     [[ $1 == orange_* ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && { echo "Error: orange_xxx is not supported for 'upstream-community-operators' !!! Exiting ..."; exit 1; }
 
-    # Fix default of k8s in tests (not needed anymore)
-    # [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 0 ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e use_cluster_filter=false -e supported_cluster_versions=latest"
-
     [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e bundle_registry=quay.io -e bundle_image_namespace=openshift-community-operators -e bundle_index_image_namespace=openshift-community-operators -e bundle_index_image_name=catalog"
     
-    # Fix default of k8s in tests (not needed anymore) 
-    # [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e bundle_registry=quay.io -e bundle_image_namespace=operatorhubio -e bundle_index_image_namespace=operatorhubio -e bundle_index_image_name=catalog -e use_cluster_filter=false -e supported_cluster_versions=latest"
     # Using default "-e use_cluster_filter=false -e supported_cluster_versions=latest" for k8s
     [[ $1 == orange* ]] && [[ $OP_TEST_PROD -eq 1 ]] && [ "$OP_TEST_STREAM" = "upstream-community-operators" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e bundle_registry=quay.io -e bundle_image_namespace=operatorhubio -e bundle_index_image_namespace=operatorhubio -e bundle_index_image_name=catalog"
     
@@ -355,13 +342,12 @@ function ExecParameters() {
     # Don't reset kind when production (It should speedup deploy when kind and registry is not needed)
     [[ $1 == orange* ]] && [[ $OP_TEST_PROD -ge 1 ]] && OP_TEST_RESET=0
 
-    # [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && [ "$OP_TEST_VERSION" != "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e fail_on_no_index_change=true"
     [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && [ "$OP_TEST_VERSION" != "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e fail_on_no_index_change=false"
     
     [[ $1 == orange* ]] && [[ $OP_TEST_PROD -ge 1 ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && [ "$OP_TEST_VERSION" == "sync" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e index_force_update=true"
     [[ $1 == orange* ]] && [[ $OP_TEST_PROD -ge 1 ]] && [[ $OP_TEST_CI_YAML_ONLY -eq 1 ]] && [ "$OP_TEST_VERSION" == "sync" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e operator_dir=/tmp/community-operators-for-catalog/$OP_TEST_STREAM/$OP_TEST_OPERATOR"
-    # [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && [[ $OP_TEST_RECREATE -eq 0 ]] && [ "$OP_TEST_VERSION" != "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e fail_on_no_index_change=true"
     [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 0 ]] && [ "$OP_TEST_VERSION" = "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e fail_on_no_index_change=false -e strict_mode=true -e index_force_update=true"
+
     # Handle OP_TEST_VER_OVERWRITE
     [[ $1 == orange* ]] && [[ $OP_TEST_VER_OVERWRITE -eq 1 ]] && [ "$OP_TEST_VERSION" != "sync" ] && [ "$OP_TEST_VERSION" != "update" ] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e operator_version=$OP_TEST_VERSION -e bundle_force_rebuild=true -e fail_on_no_index_change=false"
     # Handle OP_TEST_RECREATE
@@ -399,10 +385,6 @@ function ExecParameters() {
     # Force strict mode (force to fail on 'bundle add' and 'index add')
     [[ $OP_TEST_PROD -eq 0 ]] && OP_TEST_EXEC_USER="$OP_TEST_EXEC_USER -e strict_mode=true"
 
-
-# bundle_index_image_version
-    # TODO redhat mirror
-    #"-e mirror_index_images=quay.io/redhat/redhat----community-operator-index|redhat+iib_community|$QUAY_RH_INDEX_PW"
 }
 
 echo "Using $(ansible --version | head -n 1) on host ..."
@@ -435,13 +417,6 @@ echo -e "\nOne can do 'tail -f $OP_TEST_LOG_DIR/log.out' from second console to 
 echo -e "Checking for kind binary ..."
 if ! $DRY_RUN_CMD command -v kind > /dev/null 2>&1; then
     OP_TEST_FORCE_INSTALL=1
-# else
-#     echo -e "Testing existance of kind cluster ..."
-#     # Check if kind cluster is running
-#     if ! $DRY_RUN_CMD kind get clusters | grep operator-test > /dev/null 2>&1; then
-#         OP_TEST_FORCE_INSTALL=1
-#         echo
-#     fi
 fi
 
 # Install prerequisites (kind cluster)
