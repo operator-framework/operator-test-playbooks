@@ -10,5 +10,3 @@ eo_index_args: ""
 index_export_parallel: false
 app_registry_build_dir: "{{ catalog_repo_dir }}"
 app_registry_build_file: "upstream.Dockerfile"
-# app_registry_image: "kind-registry:5000/test-operator/app-registry"
-# app_registry_image: "quay.io/operator-framework/upstream-community-operators"

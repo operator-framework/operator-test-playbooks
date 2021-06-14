@@ -13,7 +13,7 @@
 - name: "Getting content from ci.yaml '{{ ecy_path | basename}}'"
   shell: "cat {{ ecy_path }}"
   register: ci_data_updateGraph
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: "Sets operator variables from ci.yaml '{{ ecy_path | basename }}'"
   set_fact:

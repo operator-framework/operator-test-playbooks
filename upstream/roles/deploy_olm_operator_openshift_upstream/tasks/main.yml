@@ -24,7 +24,6 @@
   include_role:
     name: detect_operators_in_cluster
     tasks_from: op_ver.yml
-#  vars:
 
 - name: "Set upstream false"
   set_fact:
@@ -98,21 +97,19 @@
 - set_fact:
     index_image_test_no_ver: "quay.io/operator_testing/{{ package_name }}"
 
-#curl -X GET https://quay.io/api/v1/repository/openshift-community-operators/aqua
 - name: "Get bundle image tag sha"
   uri:
-    url: "{{ registry_api_http_protocol | default('https') }}://quay.io/api/v1/repository/{{ test_quay_namespace }}/{{ package_name }}"
+    url: "https://quay.io/api/v1/repository/{{ test_quay_namespace }}/{{ package_name }}"
     method: GET
-    force_basic_auth: yes
+    force_basic_auth: true
     status_code: 200
-    return_content: yes
+    return_content: true
   register: dooou_manifes_digest_output
 
 - name: "Parsing manifest"
   set_fact:
     dooou_manifes_digest_output_test: "{{ dooou_manifes_digest_output.json.tags }}"
     dooou_manifes_digest_output_key: "{{ commit_tag }}"
-#    dooou_manifes_digest_output_key: "v{{ op_version }}"
 
 - name: "Parsing by a key"
   set_fact:
@@ -125,14 +122,13 @@
 
 - name: "Get labels from index"
   uri:
-    url: "{{ registry_api_http_protocol | default('https') }}://quay.io/api/v1/repository/{{ test_quay_namespace }}/{{ package_name }}/manifest/{{ dooou_manifes_digest }}/labels"
+    url: "https://quay.io/api/v1/repository/{{ test_quay_namespace }}/{{ package_name }}/manifest/{{ dooou_manifes_digest }}/labels"
     method: GET
-    force_basic_auth: yes
+    force_basic_auth: true
     status_code: 200
-    return_content: yes
+    return_content: true
   register: dooou_labels_output
 
-#curl -X GET "https://quay.io/api/v1/repository/openshift-community-operators/aqua/manifest/sha256:821441703c771a2ef9cc7daf1e24cf9d804d78a05a44c3a4b1913812738f71b0/labels"
 - name: "Setting channel 1"
   set_fact:
     current_channel_labels: "{{ dooou_labels_output.json.labels }}"
@@ -222,11 +218,6 @@
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
 
-#- name: "Disable default sources"
-#  shell: "{{ oc_bin_path }} patch OperatorHub cluster --type json -p '[{\"op\": \"add\", \"path\": \"/spec/disableAllDefaultSources\", \"value\": true}]'"
-#  environment:
-#    KUBECONFIG: "{{ kubeconfig_path }}"
-
 - name: "Apply catalogsource"
   shell: '{{ oc_bin_path }} apply -f {{ olm_operator_files_path }}/catalogsource.yml'
   environment:
@@ -287,7 +278,6 @@
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
 
-#TODO: uncomment, too many packagemanifests, maybe operator_pod_name
 - name: "Wait for the operator {{ package_name }} to be in packagemanifests"
   shell: "{{ oc_bin_path }} get packagemanifests {{ package_name }} -n test-operators"
   register: packagemanifest_presence
@@ -328,8 +318,6 @@
   ignore_errors: true
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
-
-#gather logs
 
 - name: "Get subscription"
   shell: "{{ oc_bin_path }} get sub -n {{ openshift_namespace }} | grep test-operators-ocs | cut -f1 -d' '| xargs -I{} oc describe sub {} -n {{ openshift_namespace }}"
@@ -547,7 +535,6 @@
       {{ installplan_result.stderr }}
   ignore_errors: true
 
-#output all
 - name: "Output debug - get OperatorGroup"
   shell: "cat {{ work_dir }}/dooou_get_operatorgroup_result.txt"
   ignore_errors: true
@@ -567,15 +554,10 @@
 - name: "Output debug - installplan"
   shell: "cat {{ work_dir }}/olm-installplan-debug.txt"
   ignore_errors: true
-#  when:
-#    - (operator_result.rc != 0) or ((operator_uptime.rc is not defined) or (operator_uptime.rc != 0))
 
 - name: "Output debug - catalogsource"
   shell: "cat {{ work_dir }}/olm-catalog-source-debug.txt"
   ignore_errors: true
-
-#operatorgroup
-#subscription
 
 - name: "Output debug - csv"
   shell: "cat {{ work_dir }}/olm-operator-csv-debug.txt"
@@ -615,13 +597,14 @@
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
 
-- fail:
+- name: "Fail when Operator deployment with OLM failed"
+  fail:
     msg: 'Operator deployment with OLM failed, expand log and check logs from the bottom to the top ^'
   when: operator_result.rc != 0
 
-- fail:
+- name: "Fail Operator was not capable to stay healthy for a specific time"
+  fail:
     msg: 'Operator was not capable to stay healthy for a specific time'
   when:
     - run_upstream|bool
     - operator_uptime.rc != 0
-

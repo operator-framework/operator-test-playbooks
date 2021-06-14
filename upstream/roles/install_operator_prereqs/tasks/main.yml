@@ -25,7 +25,7 @@
   unarchive:
     src: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{{ oc_version }}/openshift-client-linux-{{ oc_version }}.tar.gz"
     dest: "{{ testing_bin_path }}"
-    remote_src: yes
+    remote_src: true
   register: download_and_unpack_oc
   until: download_and_unpack_oc is succeeded
   retries: 10
@@ -38,7 +38,7 @@
   unarchive:
     src: "https://storage.googleapis.com/golang/go{{ go_version }}.linux-amd64.tar.gz"
     dest: "{{ testing_bin_path }}"
-    remote_src: yes
+    remote_src: true
   register: download_and_unpack_go
   until: download_and_unpack_go is succeeded
   retries: 10

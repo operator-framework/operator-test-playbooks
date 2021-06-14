@@ -31,7 +31,7 @@
 
     - name: "Quay login via robot"
       shell: "{{ container_tool }} login -u=\"{{ quay_user }}\" -p={{ quay_password }} quay.io"
-      no_log: True
+      no_log: true
       when:
         - quay_user is defined
         - quay_password is defined
@@ -51,7 +51,7 @@
 
     - name: "Quay login via auth token"
       shell: "{{ container_tool }} login -u=\\$oauthtoken -p={{ quay_appregistry_api_token }} quay.io"
-      no_log: True
+      no_log: true
       when: quay_appregistry_api_token is defined and quay_appregistry_api_token != ""
 
     - name: "Check for the existence of earlier releases of the operator on the quay.io app repository"
@@ -66,7 +66,7 @@
           Authorization: "basic {{ quay_appregistry_api_token }}"
       register: ptq_dir_existence
       failed_when: false
-    #    force_basic_auth: yes
+    #    force_basic_auth: true
 
     - name: "Create repo for {{ ptq_operator_dir_name }} with public visibility"
       uri:
@@ -74,11 +74,11 @@
         method: POST
         body: '{"repo_kind":"application","namespace":"{{ ptq_namespace }}","repository":"{{ ptq_operator_dir_name }}","description":"","visibility":"public"}'
         body_format: json
-        force_basic_auth: yes
+        force_basic_auth: true
         headers:
           Authorization: "Bearer {{ quay_appregistry_api_token }}"
         status_code: 201
-        return_content: yes
+        return_content: true
       when:
         - quay_appregistry_api_token != ""
         - ptq_dir_existence.status != 200

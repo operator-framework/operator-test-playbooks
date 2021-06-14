@@ -1,7 +1,7 @@
 ---
 - name: "Checking operator format consistency"
   block:
-    - name : "Find package file in '{{ cofc_operator_dir }}'"
+    - name: "Find package file in '{{ cofc_operator_dir }}'"
       find:
         paths: "{{ cofc_operator_dir }}"
         patterns: "*.package.yaml"
@@ -45,7 +45,7 @@
         - name: "Finding all versions in operator dir '{{ cofc_operator_dir }}'"
           find:
             paths: "{{ cofc_operator_dir }}"
-            recurse: no
+            recurse: false
             file_type: directory
           register: cofc_versions_find
           no_log: true

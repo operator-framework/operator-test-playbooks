@@ -77,8 +77,6 @@
 
   when: not run_upstream|bool
 
-
-
 - name: "Create the olm operator files directory"
   file:
     path: "{{ olm_operator_files_path }}"
@@ -314,4 +312,3 @@
   when:
     - run_upstream|bool
     - operator_uptime.rc != 0
-

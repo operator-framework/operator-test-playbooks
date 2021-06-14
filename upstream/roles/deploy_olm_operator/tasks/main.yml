@@ -76,8 +76,6 @@
 
   when: not run_upstream|bool
 
-
-
 - name: "Create the olm operator files directory"
   file:
     path: "{{ olm_operator_files_path }}"
@@ -302,13 +300,14 @@
     dest: "{{ work_dir }}/olm-installplan-debug.txt"
   when: installplan_result.stdout is defined
 
-- fail:
+- name: "Fail on operator deployment"
+  fail:
     msg: 'Operator deployment with OLM failed, check the olm-*.txt files for more details'
   when: operator_result.rc != 0
 
-- fail:
+- name: "Failing when operators was not capable to stay healthy"
+  fail:
     msg: 'Operator was not capable to stay healthy for a specific time'
   when:
     - run_upstream|bool
     - operator_uptime.rc != 0
-

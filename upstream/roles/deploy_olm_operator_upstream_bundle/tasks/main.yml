@@ -122,14 +122,14 @@
   ignore_errors: true
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
-  no_log: True
+  no_log: true
 
 - name: "Output the CSV description to a debug file"
   copy:
     content: "{{ csv_describe_result.stdout }}"
     dest: "{{ work_dir }}/olm-operator-csv-debug.txt"
   when: csv_describe_result.stdout != ""
-  no_log: True
+  no_log: true
 
 - debug:
     var: operator_result.rc
@@ -150,7 +150,7 @@
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
   when: csv_describe_result.stdout != ""
-  no_log: True
+  no_log: true
 
 - name: "Output the operator pod log to a debug file"
   copy:
@@ -159,7 +159,7 @@
   when:
     - csv_describe_result.stdout != ""
     - operator_pod_result.stdout != ""
-  no_log: True
+  no_log: true
 
 - name: "Print operator pod log in case of an error"
   debug:
@@ -176,7 +176,7 @@
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
   when: csv_describe_result.stdout != ""
-  no_log: True
+  no_log: true
 
 - name: "Output the operator container log to a debug file"
   copy:
@@ -185,7 +185,7 @@
   when:
     - csv_describe_result.stdout != ""
     - operator_container_result.stdout != ""
-  no_log: True
+  no_log: true
 
 - name: "Print operator container log in case of an error"
   debug:
@@ -202,14 +202,14 @@
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
   when: run_upstream|bool
-  no_log: True
+  no_log: true
 
 - name: "Output the catalogsource log to a debug file"
   copy:
     content: "{{ catalog_source_result.stdout }}"
     dest: "{{ work_dir }}/olm-catalog-source-debug.txt"
   when: catalog_source_result.stdout is defined
-  no_log: True
+  no_log: true
 
 - name: "Print catalogsource pod log (upstream) in case of an error"
   debug:
@@ -224,14 +224,14 @@
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
   when: run_upstream|bool
-  no_log: True
+  no_log: true
 
 - name: "Output the catalog-operator log to a debug file"
   copy:
     content: "{{ catalog_operator_result.stdout }}"
     dest: "{{ work_dir }}/olm-catalog-operator-debug.txt"
   when: catalog_operator_result.stdout is defined
-  no_log: True
+  no_log: true
 
 - name: "Print catalog-operator log in case of an error"
   debug:
@@ -245,21 +245,21 @@
   register: installplan_result
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
-  no_log: True
+  no_log: true
 
 - name: "Get the InstallPlan debug output"
   shell: "{{ oc_bin_path }} describe installplan {{ upstream_namespace_param }}"
   register: installplan_result
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
-  no_log: True
+  no_log: true
 
 - name: "Output the InstallPlan debug output to a debug file"
   copy:
     content: "{{ installplan_result.stdout }}"
     dest: "{{ work_dir }}/olm-installplan-debug.txt"
   when: installplan_result.stdout is defined
-  no_log: True
+  no_log: true
 
 - name: "Print catalog-operator log in case of an error"
   debug:

@@ -9,7 +9,7 @@
       copy:
         src: /etc/ssl/certs/ca-certificates.crt
         dest: "{{ iib_project_dir }}/ca-bundle.crt"
-        remote_src: yes
+        remote_src: true
         backup: yes
       when:
         - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

@@ -3,7 +3,6 @@
   set_fact:
     dov_op_name: "{{ cic_chi_git_not_index_operator.split(':')[0] }}"
     doic_versions_processing: "{{ cic_chi_git_not_index_operator.split(':v')[1] }}"
-#    ocp_version_annotation_stdout: "NotFound"
     ptq_ready: false
     ocp_version_annotation_stdout:
 
@@ -20,12 +19,6 @@
   include_tasks: get_info.yml
   when:
     - annotations_file_path_presence.stat.exists
-
-- debug:
-    var: ptq_ready
-
-- debug:
-    var: annotations_file_path_presence
 
 - name: "No files to check cluster version - ready for 'Push to appreg'"
   set_fact:
@@ -59,7 +52,5 @@
     name: detect_operators_in_cluster
     tasks_from: simple_found_or_not.yml
   when:
-#    - (ocp_version_annotation_stdout is not defined) or (ocp_version_annotation_stdout== "")
     - ptq_ready|bool
     - quay_appregistry_courier_token is defined
-

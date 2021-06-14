@@ -6,6 +6,7 @@
         operator_name: "{{ operator_input_image.split(':')[0] | basename }}"
         op_version: "{{ operator_input_image.split(':')[1] }}"
         operator_format: "bundle"
+
     - name: "Remove bundle image {{ bundle_image }}"
       shell: "{{ container_tool }} rmi -f {{ bundle_image }}"
       failed_when: false
@@ -27,13 +28,11 @@
       copy:
         src: "{{ operator_dir }}"
         dest: "{{ operator_bundle_src_dir }}"
-        remote_src: yes
+        remote_src: true
 
     - name: detect format
       include_role:
         name: detect_format
-      # vars:
-      #   op_version: "{{ op_version }}"
 
     - name: "Setting 'bundle_image' and 'clusterserviceversion_bundle_file_path' in case of manifest format"
       set_fact:
@@ -69,11 +68,6 @@
             - name: "Sets `boi_ci_update_graph_var` from '{{ opm_index_ci_filename }}' file"
               set_fact:
                 boi_ci_update_graph_var: "{{ boi_ci_update_graph.stdout | replace('-mode','') }}"
-
-            # - name: "Failing when 'updateGraph' value is missing"
-            #   fail:
-            #     msg: "Key 'updateGraph' was not found in file '{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ opm_index_ci_filename }}'!!!"
-            #   when: boi_ci_update_graph_var == "null"
 
             - name: "Setting index add mode from 'updateGraph' value to 'semver' because it is not present in '{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ opm_index_ci_filename }}'"
               set_fact:
@@ -205,14 +199,6 @@
           shell: "{{ container_tool }} rmi -f {{ bundle_image }}"
           failed_when: false
 
-        # - name: "Generate bundle image {{ bundle_image }} from bundle format"
-        #   shell:
-        #     cmd: "{{ opm_bin_path }} alpha bundle build --directory {{ op_version }}/{{ operator_manifest_dir }} --package {{ operator_package_name }} -t {{ bundle_image }} -c {{ operator_channels }} -e {{ operator_channel_default }} -b {{ opm_container_tool }}"
-        #     chdir: "{{ operator_bundle_src_dir }}/{{ operator_package_name }}"
-        #   # failed_when: false
-        #   ignore_errors: yes
-        #   register: bb_rc
-
         - name: "Remove docker file '{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/Dockerfile'"
           file:
             path: "{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}/Dockerfile"
@@ -290,7 +276,7 @@
           shell:
             cmd: "{{ container_tool }} build --tag {{ bundle_image }} ."
             chdir: "{{ operator_bundle_src_dir }}/{{ operator_package_name }}/{{ op_version }}"
-          ignore_errors: yes
+          ignore_errors: true
           register: bb_rc
 
         - name: "Push image '{{ bundle_image }}'"
@@ -327,7 +313,8 @@
             msg: "Bundle '{{ bundle_image }}' was created and pushed : [FAIL]"
           when:
             - not result_rc|bool
-            - (strict_mode is defined and strict_mode|bool)
+            - strict_mode is defined
+            - strict_mode|bool
 
         - name: "Operator scorcard bundle test"
           include_role:
@@ -359,7 +346,7 @@
           shell:
             cmd: "{{ opm_bin_path }} alpha bundle build --directory {{ op_version }} --package {{ operator_package_name }} -t {{ bundle_image }} -b {{ opm_container_tool }} {{ opm_bundle_alpha_add_args }}"
             chdir: "{{ operator_bundle_src_dir }}/{{ operator_dir_name }}"
-          ignore_errors: yes
+          ignore_errors: true
           register: mb_rc
 
         - name: "Push image '{{ bundle_image }}'"
@@ -396,7 +383,8 @@
             msg: "Bundle '{{ bundle_image }}' was created and pushed : [FAIL]"
           when:
             - not result_rc|bool
-            - (strict_mode is defined and strict_mode|bool)
+            - strict_mode is defined
+            - strict_mode|bool
 
         - name: "Operator scorcard bundle test"
           include_role:
@@ -410,7 +398,6 @@
       when:
         - operator_format == "manifest"
         - (bovb_bundle_image_pull_test.rc is undefined or bovb_bundle_image_pull_test.rc != 0)
-
 
     - name: "Add failed operators when creating bundle"
       set_fact:

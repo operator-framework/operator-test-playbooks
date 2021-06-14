@@ -4,14 +4,14 @@
     bar_operator_package: "{{ bar_op }}"
     bar_download_folder: "{{ app_registry_base_dir }}/{{ bar_op  }}"
   when:
-  - not app_registry_parallel|bool
+    - not app_registry_parallel|bool
 
 - name: "Setting export directory"
   set_fact:
     bar_operator_package: "{{ bar_op }}"
     bar_download_folder: "{{ app_registry_base_dir }}"
   when:
-  - app_registry_parallel|bool
+    - app_registry_parallel|bool
 
 - name: "Ensure that the 'bar_download_folder' directory exists and is empty"
   file:

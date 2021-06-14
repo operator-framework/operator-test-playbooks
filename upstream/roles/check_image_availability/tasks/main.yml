@@ -5,7 +5,7 @@
     - name: "Set basics"
       find:
         paths: "{{ operator_dir }}/{{ op_version }}"
-        recurse: yes
+        recurse: true
         file_type: file
         patterns: "*.clusterserviceversion.yaml"
       register: cia_csv_paths
@@ -35,12 +35,12 @@
 - name: "Getting external image from csv '{{ csv_file_path | basename}}'"
   shell: "{{ yq_bin_path }} r {{ csv_file_path }} -t metadata.annotations.containerImage"
   register: operator_external_image_raw
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: "Sets operator external image from csv '{{ csv_file_path | basename }}'"
   set_fact:
     operator_external_image: "{{ operator_external_image_raw.stdout | from_yaml }}"
-  ignore_errors: yes
+  ignore_errors: true
   when: operator_external_image_raw is defined
 
 - name: "Print err message if image not found"

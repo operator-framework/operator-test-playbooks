@@ -96,12 +96,12 @@
     - name: "Getting categories content from csv '{{ csv_file_path | basename}}'"
       shell: "{{ yq_bin_path }} r {{ csv_file_path }} -t metadata.annotations.categories"
       register: csv_data_metadata_annotations_categories
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: "Sets operator categories from csv '{{ csv_file_path | basename }}'"
       set_fact:
         vob_categories: "{{ csv_data_metadata_annotations_categories.stdout | from_yaml }}"
-      ignore_errors: yes
+      ignore_errors: true
       when: csv_data_metadata_annotations_categories is defined
 
     - name: "Failing when 'categories' are missing'"

@@ -6,7 +6,7 @@
 
 - name: "Quay login"
   shell: "{{ container_tool }} login -u=\"{{ quay_user }}\" -p={{ quay_password }} quay.io"
-  no_log: True
+  no_log: true
   when:
     - quay_user is defined
     - quay_password is defined
@@ -15,8 +15,10 @@
 
 - name: "Quay login via auth token"
   shell: "{{ container_tool }} login -u=\\$oauthtoken -p={{ quay_api_token }} quay.io"
-  no_log: True
-  when: (quay_user is undefined or quay_password is undefined or quay_user == "" or quay_password == "") and quay_api_token is defined and quay_api_token != ""
+  no_log: true
+  when:
+    - (quay_user is undefined or quay_password is undefined or quay_user == "" or quay_password == "")
+    - quay_api_token is defined and quay_api_token != ""
 
 - name: "Gather list of all operators"
   include_role:
@@ -51,7 +53,6 @@
     app_registry_base_dir: "{{ bundle_export_dir_app_registry }}"
     app_registry_parallel: true
     bar_op: "{{ gaotd_operator_packages | join(',') }}"
-    # eo_index_args: "{{ eo_index_args }}"
   when: index_export_parallel|bool
 
 - name: "Building and pushing app registry"

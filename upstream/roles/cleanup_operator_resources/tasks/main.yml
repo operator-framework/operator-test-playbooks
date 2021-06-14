@@ -2,7 +2,7 @@
 - name: "Find all processed resources in the deploy directory"
   find:
     paths: "{{ olm_operator_files_path }}"
-    recurse: no
+    recurse: false
     file_type: file
     patterns: "*.yml"
   register: cor_all_yml

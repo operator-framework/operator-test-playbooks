@@ -2,7 +2,7 @@
 - name: "Mirroring image to multiple locations"
   block:
     - name: "Parsing output image with login information"
-      no_log: True
+      no_log: true
       set_fact:
         ms_info: "{{ mi.split('|') }}"
         ms_image_postfix: ""
@@ -15,13 +15,13 @@
 
     - name: "Login to docker registry"
       shell: "{{ container_tool }} login -u={{ ms_info[1]}} -p={{ ms_info[2] }} {{  ms_info[0].split('/')[0] }}"
-      no_log: True
+      no_log: true
       when:
         - ms_info.1 is defined
         - ms_info.2 is defined
 
     - name: "Add index image postfix if needed"
-      no_log: True
+      no_log: true
       set_fact:
         ms_image_postfix: "{{ ms_info[3] }}"
       when:
@@ -80,8 +80,8 @@
             url: "{{ iib_base_url }}/api/v1/builds/{{ mi_ms_iib_id }}/logs"
             method: GET
             validate_certs: no
-            return_content: yes
-          no_log: True
+            return_content: true
+          no_log: true
           register: mi_ms_multiarch_response
           until: "'complete' in mi_ms_multiarch_response.content"
           retries: 50
@@ -97,7 +97,7 @@
 
         - name: "Transfer image from '{{ mi_ms_iib_image }}' to '{{ ms_info[4] }}'"
           shell: "skopeo copy -a docker://{{ mi_ms_iib_image }} docker://{{ ms_info[4] }} --src-tls-verify=false"
-          no_log: True
+          no_log: true
           when:
             - ms_info.4 is defined
 

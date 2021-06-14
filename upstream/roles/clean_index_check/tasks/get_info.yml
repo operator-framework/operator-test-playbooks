@@ -9,20 +9,20 @@
 
 - name: "Set parsed versions"
   when:
-   - ocp_version_annotation is defined
-   - ocp_version_annotation.stdout is defined
-   - ocp_version_annotation.stdout!='null'
-   - ocp_version_annotation.stdout!=''
-   - annotations_file_path_presence.stat.exists
+    - ocp_version_annotation is defined
+    - ocp_version_annotation.stdout is defined
+    - ocp_version_annotation.stdout!='null'
+    - ocp_version_annotation.stdout!=''
+    - annotations_file_path_presence.stat.exists
   set_fact:
     ocp_version_annotation_stdout: "{{ ocp_version_annotation.stdout }}"
     ptq_ready: false
 
 - name: "Annotation file exists with no entry about OCP version"
   when:
-   - ocp_version_annotation is defined
-   - ocp_version_annotation.stdout is defined
-   - ocp_version_annotation.stdout=='null'
-   - annotations_file_path_presence.stat.exists
+    - ocp_version_annotation is defined
+    - ocp_version_annotation.stdout is defined
+    - ocp_version_annotation.stdout=='null'
+    - annotations_file_path_presence.stat.exists
   set_fact:
     ptq_ready: true

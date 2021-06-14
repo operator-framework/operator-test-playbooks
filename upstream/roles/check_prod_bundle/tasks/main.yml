@@ -1,5 +1,4 @@
 ---
-
 - name: "Failing when 'production_registry_namespace' is missing"
   fail:
     msg: "The 'production_registry_namespace' variable is missing. Please set it via '-e production_registry_namespace=<registry/namespace>'"
@@ -20,8 +19,8 @@
   set_fact:
     cpb_versions: "{{ (cpb_prod_registry_versions.json.tags | sort_versions | join(',') | regex_replace('^v') | regex_replace(',v',',')).split(',') }}"
   when:
-  - cpb_prod_registry_versions.status is defined
-  - cpb_prod_registry_versions.status == 200
+    - cpb_prod_registry_versions.status is defined
+    - cpb_prod_registry_versions.status == 200
 
 - name: "Converting 'operator_version' to list"
   set_fact:

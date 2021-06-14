@@ -13,7 +13,7 @@
 
 
 - name: "Parsing output image with login information"
-  no_log: True
+  no_log: true
   set_fact:
     bs_bundle: "{{ item.split(':') }}"
 
@@ -23,4 +23,3 @@
   when:
     - bs_skopeo_inspect_info.Digest is defined
     - bs_skopeo_inspect_info.Digest != ""
-

@@ -74,9 +74,9 @@
       block:
         - name: "Get list of all repositories in {{ bundles_namespace }}"
           uri:
-            url: "{{ registry_api_http_protocol | default('https') }}://quay.io/api/v1/repository?namespace={{ bundles_namespace }}"
+            url: "https://quay.io/api/v1/repository?namespace={{ bundles_namespace }}"
             method: GET
-            force_basic_auth: yes
+            force_basic_auth: true
             headers:
               Authorization: "Bearer {{ quay_api_token }}"
           register: chi_list_bundles_in_quay

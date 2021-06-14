@@ -82,7 +82,7 @@
   copy:
     src: "{{ operator_dir }}/"
     dest: "{{ operator_work_dir }}"
-    remote_src: yes
+    remote_src: true
   when: run_upstream|bool
 
 - name: "Parse operator metadata needed to run the tests (Openshift)"

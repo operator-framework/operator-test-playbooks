@@ -33,21 +33,7 @@ olm_operator_files_path: "/tmp/oper-to-deploy-{{ dir_suffix_part }}"
 run_bundle_test: false
 operator_bundle_src_dir: "{{ work_dir }}/operator-bundle/src"
 operator_dir_name: "{{ operator_dir | basename }}"
-#test_quay_namespace: openshift-community-operators
 test_quay_namespace: operator_testing
 oc_version_test: "4.6"
 operator_suggested_namespace_default: test-operators
 pod_start_retries: 90
-#operator_work_dir: /home/jenkins/agent/test-operator
-#run_host_init: true
-#run_prereqs: true
-#run_lint: true
-#run_catalog_init: true
-#run_deploy: true
-#run_scorecard: true
-#run_imagesource: true
-#run_cleanup: true
-#run_remove_catalog_repo: true
-#run_manifest_test: false
-#run_bundle_test: true
-#bundle_image: "dummy" # so skopeo and umoci will be installed

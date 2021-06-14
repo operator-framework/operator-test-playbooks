@@ -5,10 +5,10 @@
       find:
         paths: "{{ operator_base_dir }}"
         patterns: "{{ all_operator_find_filter }}"
-        recurse: no
+        recurse: false
         file_type: directory
         excludes: "{{ all_operator_find_excludes }}"
-      no_log: True
+      no_log: true
       register: gaotd_operators_find
 
     - name: "Setting list of all operators"
