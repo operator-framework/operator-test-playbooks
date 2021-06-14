@@ -44,4 +44,3 @@
   when:
     - save_operator_tools_info is defined
     - save_operator_tools_info|bool
-

@@ -16,10 +16,6 @@
     name: install_operator_prereqs
   when: run_prereqs|bool
 
-# - name: "Reset value for unified package test"
-#   set_fact:
-#     previous_package: ''
-
 - name: "Failing when operator version is not defined"
   fail:
     msg: "Operator version 'operator_version' is undefined !!!"
@@ -101,7 +97,6 @@
               shell: "{{ oc_bin_path }} delete catalogsource operatorhubio-catalog -n olm"
               failed_when: false
           when:
-            # - olm_needed.stdout != "operatorgroup"
             - olm_needed.stdout is not search('operatorgroup')
 
       when: run_upstream|bool

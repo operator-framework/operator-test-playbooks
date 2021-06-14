@@ -10,7 +10,7 @@
     clean_index_check: true
     cic_community: true
     dov_cluster_ver: "v4.5"
-    chi_git_not_index_operators_not_needed: [ ]
+    chi_git_not_index_operators_not_needed: []
 
 - name: "Run clean_list - detect if 4.5 is supported"
   include_role:
@@ -66,7 +66,6 @@
           Authorization: "basic {{ quay_appregistry_api_token }}"
       register: ptq_dir_existence
       failed_when: false
-    #    force_basic_auth: true
 
     - name: "Create repo for {{ ptq_operator_dir_name }} with public visibility"
       uri:
@@ -98,10 +97,7 @@
 
     - name: "Push the operator metadata to the quay.io repository"
       shell: "operator-courier push {{ ptq_download_folder }}/{{ ptq_operator_package_name }} {{ ptq_namespace }} {{ ptq_operator_package_name }} {{ quay_release }} \"basic {{ quay_appregistry_courier_token }}\""
-      # no_log: true
 
   when:
-   - ptq_ready is defined
-   - ptq_ready|bool
-
-
+    - ptq_ready is defined
+    - ptq_ready|bool

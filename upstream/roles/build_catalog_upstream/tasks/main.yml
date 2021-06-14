@@ -8,13 +8,13 @@
   docker_image:
     name: "{{ catalog_image_registry }}/{{ catalog_image_namespace }}/{{ catalog_image_name }}"
     build:
-      pull: yes
+      pull: true
       path: "{{ catalog_repo_dir }}"
       dockerfile: "{{ catalog_repo_dir }}/{{ catalog_dockerfile }}"
       args:
         PERMISSIVE_LOAD: false
     tag: "{{ catalog_image_tag }}"
-    push: yes
+    push: true
     source: build
   tags:
     - catalog_build

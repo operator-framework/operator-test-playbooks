@@ -8,7 +8,6 @@
       contains: 'packageName'
     register: package_path_result
 
-    # assuming only one file matches the file path
   - name: "set variable for package_path from package_path_result"
     set_fact:
       package_path: "{{ package_path_result.files[0].path }}"
@@ -21,22 +20,22 @@
 
   - name: "Load variables from package path into variable package_vars (upstream only)"
     block:
-    - name: Check if package file exists
-      stat:
-        path: "{{ package_path }}"
-      register: package_file_st
+      - name: "Check if package file exists"
+        stat:
+          path: "{{ package_path }}"
+        register: package_file_st
 
-    - name: Fail if package file doesn't exists
-      fail:
-      when: not package_file_st.stat.exists
+      - name: "Fail if package file doesn't exists"
+        fail:
+        when: not package_file_st.stat.exists
 
-    - name: "Getting content of package file '{{ pkg_file_path }}'"
-      shell: "cat {{ package_path }}"
-      register: package_data
+      - name: "Getting content of package file '{{ pkg_file_path }}'"
+        shell: "cat {{ package_path }}"
+        register: package_data
 
-    - name: Set facts
-      set_fact:
-        package_vars: "{{ package_data.stdout | from_yaml }}"
+      - name: "Set package vars"
+        set_fact:
+          package_vars: "{{ package_data.stdout | from_yaml }}"
     when: run_upstream|bool
 
   - name: "GET package_name variable from loaded package_vars"
@@ -68,7 +67,7 @@
 
   - name: "Determine the current clustersourceversion for the operator channel"
     set_fact:
-      current_csv : "{{ package_vars['channels'] | json_query(query) }}"
+      current_csv: "{{ package_vars['channels'] | json_query(query) }}"
     vars:
       query: "[?name=='{{ current_channel }}'].currentCSV"
     failed_when: current_csv | length == 0

@@ -51,8 +51,8 @@
       delay: 15
       failed_when: operator_sdk_install_result is failure
       when:
-       - not rkr_osdk.stat.exists
-       - not run_upstream|bool
+        - not rkr_osdk.stat.exists
+        - not run_upstream|bool
 
     - name: "Install operator-sdk {{ operator_sdk_version }}"
       get_url:
@@ -65,8 +65,8 @@
       delay: 15
       failed_when: operator_sdk_install_result is failure
       when:
-       - not rkr_osdk.stat.exists
-       - run_upstream|bool
+        - not rkr_osdk.stat.exists
+        - run_upstream|bool
 
     - name: "Installing OLM ({{ olm_version }})"
       shell: "{{ operator_sdk_bin_path }} olm install --version {{ olm_version }} --timeout 5m0s"
@@ -74,11 +74,13 @@
   tags:
     - always
   rescue:
-    - fail:
+    - name: "Fail after 5 retries"
+      fail:
         msg: Ended after 5 retries
       when: delete_kind_retry_count|int > 5
 
-    - debug:
+    - name: "Print process info"
+      debug:
         msg: "Failed to install kind and registry - Retrying ({{ delete_kind_retry_count }}/5) ..."
 
     - include_tasks: reset.yml

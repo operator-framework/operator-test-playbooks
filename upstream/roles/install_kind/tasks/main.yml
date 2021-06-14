@@ -4,7 +4,7 @@
   file:
     path: "{{ kind_bin_path }}"
     state: absent
-  become: yes
+  become: true
   tags:
     - never
     - uninstall
@@ -26,8 +26,8 @@
       retries: 10
       delay: 15
       failed_when: kind_install_result is failure
-      become: yes
-      when: rc_kind.stat.exists == false
+      become: true
+      when: not rc_kind.stat.exists|bool
   tags:
     - reset
     - install

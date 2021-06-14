@@ -43,7 +43,6 @@
       set_fact:
         operator_name: "{{ operator_vars.metadata.name.split('.')[0] }}"
         op_version: "{{ operator_vars.metadata.name.split('.v')[1:] | join('.') }}"
-    # TODO PARSE version from spec.version to op_version
   when:
     - operator_input_image is defined
     - operator_input_image != ""

@@ -10,7 +10,7 @@
         src: /etc/ssl/certs/ca-certificates.crt
         dest: "{{ iib_project_dir }}/ca-bundle.crt"
         remote_src: true
-        backup: yes
+        backup: true
       when:
         - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
         - iib_apply_fix|bool
@@ -59,16 +59,16 @@
   tags:
     - never
     - iib
-
-  # Remove 'become: yes' in future would be nice
-  become: yes
+  become: true
 
   rescue:
-    - fail:
+    - name: "Fail when number of retries were reached"
+      fail:
         msg: Ended after 5 retries
       when: iib_retry_count|int > 5
 
-    - debug:
+    - name: "Print iib install message"
+      debug:
         msg: "Failed to install iib - Retrying ({{ iib_retry_count }}/5) ..."
 
     - include_tasks: reset.yml

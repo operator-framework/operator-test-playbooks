@@ -1,6 +1,7 @@
 ---
 
-- debug:
+- name: "Prints item"
+  debug:
     var: si_item
 
 - name: "Export ci.yaml info"
@@ -18,5 +19,3 @@
     opm_index_add_mode: "{{ ci_yaml_vars.updateGraph | replace('-mode','') }}"
     sis_export_skip: true
     sis_index_rm_skip: true
-
-

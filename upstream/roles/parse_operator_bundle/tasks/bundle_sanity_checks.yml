@@ -1,5 +1,4 @@
 ---
-# Note: we probably want to make this more robust in the future to make a sliding scale that can be adjusted on the fly based on configuration?
 - name: "Verify ocp versions are valid"
   fail:
     msg: "com.redhat.openshift.versions must only contain v4.5"
@@ -40,7 +39,6 @@
 - name: "Loop ver all annotation values"
   include_tasks: check_annotation_label.yml
   with_items:
-    # - operators.operatorframework.io.bundle.channel.default.v1
     - operators.operatorframework.io.bundle.channels.v1
     - operators.operatorframework.io.bundle.manifests.v1
     - operators.operatorframework.io.bundle.mediatype.v1

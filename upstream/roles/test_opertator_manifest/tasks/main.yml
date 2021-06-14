@@ -89,11 +89,6 @@
   include_role:
     name: parse_operator_metadata
 
-#- name: "Run linting tests with operator-courier verify on the deployed operator"
-#  include_role:
-#    name: operator_courier_verify
-#  when: run_lint|bool
-
 - name: "Run catalog initialization test on operator metadata"
   include_role:
     name: operator_catalog_initialization_test
@@ -126,7 +121,8 @@
       no_log: true
       when: not run_upstream|bool
 
-    - set_fact:
+    - name: "Setting openshift_images_before"
+      set_fact:
         openshift_images_before: " {{ os_registry_is_result_before.stdout_lines }} + {{ os_pod_is_result_before.stdout_lines }}"
       when: not run_upstream|bool
 
@@ -160,7 +156,8 @@
       no_log: true
       when: not run_upstream|bool
 
-    - set_fact:
+    - name: "Setting openshift_images_after"
+      set_fact:
         openshift_images_after: "{{ os_registry_is_result_after.stdout_lines }} + {{ os_pod_is_result_after.stdout_lines }}"
       when: not run_upstream|bool
 

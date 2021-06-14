@@ -52,7 +52,8 @@
       loop_control:
         loop_var: gaotd_dir
 
-    - debug:
+    - name: "Print operators with versions"
+      debug:
         var: all_operators_with_versions
 
     - name: "Print some info"

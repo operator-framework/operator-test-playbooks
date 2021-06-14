@@ -11,13 +11,12 @@
 
 - name: "Set basic facts"
   set_fact:
-    operator_sdk_bin_path: "{{ testing_bin_path}}/operator-sdk"
+    operator_sdk_bin_path: "{{ testing_bin_path }}/operator-sdk"
     oc_bin_path: '{{ ''kubectl'' if run_upstream else "{{ testing_bin_path }}/oc" }}'
     jq_bin_path: "{{ testing_bin_path }}/jq"
     yq_bin_path: "{{ testing_bin_path }}/yq"
     go_bin_path: "{{ testing_bin_path }}/go/bin/go"
     umoci_bin_path: "{{ testing_bin_path }}/umoci"
-    # bundle_image: "{{ 'dummy' if run_upstream else '' }}"
     offline_cataloger_bin_path: "offline-cataloger"
 
 # Install the oc client to talk to any Openshift cluster
@@ -130,7 +129,7 @@
   failed_when: dyff_install_result is failure
   environment:
     PATH: "/tmp/operator-test/bin:{{ ansible_env.PATH }}"
-  become: yes
+  become: true
   tags:
     - install
     - reset_tools
@@ -166,14 +165,12 @@
         - offline_cataloger_help_result.rc is defined
         - offline_cataloger_help_result.rc != 0
 
-    - set_fact:
+    - name: "Set offline cataloger bin path"
+      set_fact:
         offline_cataloger_bin_path: "{{ go_bin_path }} run -mod=vendor ./cmd/offline-cataloger/main.go"
       when:
         - offline_cataloger_help_result.rc is defined
         - offline_cataloger_help_result.rc != 0
-  # when:
-  #   - operator_dir is defined
-  #   - operator_dir != ""
   tags:
     - install
     - reset_tools
@@ -181,7 +178,6 @@
 
 - name: "Install prerequisites specific to operator bundle image testing"
   block:
-
     - name: "Check if skopeo is installed"
       shell: "skopeo -h"
       register: skopeo_help_result
@@ -189,7 +185,6 @@
 
     - name: "Install skopeo"
       block:
-
         - name: "Generating file for install_skopeo.sh"
           template:
             src: install_skopeo.sh.j2
@@ -252,9 +247,6 @@
         - install
         - uninstall
         - reset_tools
-  # when:
-  #   - bundle_image is defined
-  #   - bundle_image != ""
   tags:
     - install
     - image_build

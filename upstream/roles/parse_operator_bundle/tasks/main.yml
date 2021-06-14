@@ -43,7 +43,6 @@
   - name: "Set the main operator bundle info as parsed from the bundle image labels"
     set_fact:
       package_name: "{{ skopeo_inspect_json.Labels['operators.operatorframework.io.bundle.package.v1'] }}"
-      # default_channel: "{{ skopeo_inspect_json.Labels['operators.operatorframework.io.bundle.channel.default.v1'] }}"
       channels: "{{ skopeo_inspect_json.Labels['operators.operatorframework.io.bundle.channels.v1'].split(',') }}"
       is_bundle_image: true
       ocp_versions: []
@@ -72,101 +71,99 @@
       is_backport: "{{ skopeo_inspect_json.Labels['com.redhat.delivery.backport'] }}"
     when: skopeo_inspect_json.Labels['com.redhat.delivery.backport'] is defined
 
-#  - name: "Default doic_skip_file_check true"
-#    set_fact:
-#       doic_skip_file_check: false
 
-  - block:
-    - name: "Determine paths with kind ClusterServiceVersion"
-      find:
-        paths: "{{ operator_work_dir }}"
-        file_type: file
-        contains: 'kind: ClusterServiceVersion'
-        recurse: true
-      register: kind_custerserviceversion_file_paths
+  - name: "Parse ClusterServiceVersion"
+    block:
+      - name: "Determine paths with kind ClusterServiceVersion"
+        find:
+          paths: "{{ operator_work_dir }}"
+          file_type: file
+          contains: 'kind: ClusterServiceVersion'
+          recurse: true
+        register: kind_custerserviceversion_file_paths
 
-    - name: "Set the first location found as the CSV path since the operator bundles only support having one CSV"
-      set_fact:
-        csv_path: "{{ kind_custerserviceversion_file_paths['files'][0]['path'] }}"
+      - name: "Set the first location found as the CSV path since the operator bundles only support having one CSV"
+        set_fact:
+          csv_path: "{{ kind_custerserviceversion_file_paths['files'][0]['path'] }}"
 
-    - name: "Set variables for csv_path and current_csv_dir"
-      set_fact:
-        current_csv_dir: "{{ csv_path | dirname }}"
+      - name: "Set variables for csv_path and current_csv_dir"
+        set_fact:
+          current_csv_dir: "{{ csv_path | dirname }}"
 
-    - name: "Determine the CRD paths in the operator metadata directory"
-      find:
-        paths: "{{ current_csv_dir }}"
-        file_type: file
-        contains: 'kind: CustomResourceDefinition'
-      register: crd_paths_result
+      - name: "Determine the CRD paths in the operator metadata directory"
+        find:
+          paths: "{{ current_csv_dir }}"
+          file_type: file
+          contains: 'kind: CustomResourceDefinition'
+        register: crd_paths_result
 
-    - name: "Set crd_paths to collect crd_paths"
-      set_fact:
-        crd_paths: []
+      - name: "Set crd_paths to collect crd_paths"
+        set_fact:
+          crd_paths: []
 
-    - name: "Get paths from crd_paths_result"
-      set_fact:
-        crd_paths: "{{ crd_paths + [item.path] }}"
-      with_items: "{{ crd_paths_result['files'] }}"
-      no_log: true
+      - name: "Get paths from crd_paths_result"
+        set_fact:
+          crd_paths: "{{ crd_paths + [item.path] }}"
+        with_items: "{{ crd_paths_result['files'] }}"
+        no_log: true
 
-    - name: "Include the CSV path into the ansible vars"
-      include_vars:
-        file: "{{ csv_path }}"
-        name: operator_vars
-      when: not run_upstream|bool
+      - name: "Include the CSV path into the ansible vars"
+        include_vars:
+          file: "{{ csv_path }}"
+          name: operator_vars
+        when: not run_upstream|bool
 
-    - name: "List of operator variables"
-      debug:
-        var: operator_vars
-        verbosity: 2
+      - name: "List of operator variables"
+        debug:
+          var: operator_vars
+          verbosity: 2
 
-    - name: "Determine and set fact for operator specific information - name, pod name, container name and capabilities"
-      set_fact:
-        current_csv: "{{ operator_vars.metadata.name }}"
-        operator_pod_name: "{{ operator_vars.spec.install.spec.deployments[0].name }}"
-        operator_container_name: "{{ operator_vars.spec.install.spec.deployments[0].spec.template.spec.containers[0].name }}"
-        operator_capabilities: "{{ operator_vars.metadata.annotations.capabilities | default('Basic Install')}}"
+      - name: "Determine and set fact for operator specific information - name, pod name, container name and capabilities"
+        set_fact:
+          current_csv: "{{ operator_vars.metadata.name }}"
+          operator_pod_name: "{{ operator_vars.spec.install.spec.deployments[0].name }}"
+          operator_container_name: "{{ operator_vars.spec.install.spec.deployments[0].spec.template.spec.containers[0].name }}"
+          operator_capabilities: "{{ operator_vars.metadata.annotations.capabilities | default('Basic Install')}}"
 
-    - name: "Determine operator_allnamespaces_support"
-      set_fact:
-        operator_allnamespaces_support: "{{ operator_vars.spec.installModes | json_query(query) }}"
-      vars:
-        query: "[?type=='AllNamespaces'].supported"
+      - name: "Determine operator_allnamespaces_support"
+        set_fact:
+          operator_allnamespaces_support: "{{ operator_vars.spec.installModes | json_query(query) }}"
+        vars:
+          query: "[?type=='AllNamespaces'].supported"
 
-    - name: "Determine operator_ownnamespace_support"
-      set_fact:
-        operator_ownnamespace_support: "{{ operator_vars.spec.installModes | json_query(query) }}"
-      vars:
-        query: "[?type=='OwnNamespace'].supported"
+      - name: "Determine operator_ownnamespace_support"
+        set_fact:
+          operator_ownnamespace_support: "{{ operator_vars.spec.installModes | json_query(query) }}"
+        vars:
+          query: "[?type=='OwnNamespace'].supported"
 
-    - name: "Determine operator_singlenamespace_support"
-      set_fact:
-        operator_singlenamespace_support: "{{ operator_vars.spec.installModes | json_query(query) }}"
-      vars:
-        query: "[?type=='SingleNamespace'].supported"
+      - name: "Determine operator_singlenamespace_support"
+        set_fact:
+          operator_singlenamespace_support: "{{ operator_vars.spec.installModes | json_query(query) }}"
+        vars:
+          query: "[?type=='SingleNamespace'].supported"
 
-    - name: "Determine operator_multinamespace_support"
-      set_fact:
-        operator_multinamespace_support: "{{ operator_vars.spec.installModes | json_query(query) }}"
-      vars:
-        query: "[?type=='MultiNamespace'].supported"
+      - name: "Determine operator_multinamespace_support"
+        set_fact:
+          operator_multinamespace_support: "{{ operator_vars.spec.installModes | json_query(query) }}"
+        vars:
+          query: "[?type=='MultiNamespace'].supported"
 
-    - name: "Set boolean value for different types of namespaces"
-      set_fact:
-        operator_allnamespaces_support: "{{ false if operator_allnamespaces_support == [] else operator_allnamespaces_support[0] }}"
-        operator_ownnamespace_support: "{{ false if operator_ownnamespace_support == [] else operator_ownnamespace_support[0] }}"
-        operator_singlenamespace_support: "{{ false if operator_singlenamespace_support == [] else operator_singlenamespace_support[0] }}"
-        operator_multinamespace_support: "{{ false if operator_multinamespace_support == [] else operator_multinamespace_support[0] }}"
+      - name: "Set boolean value for different types of namespaces"
+        set_fact:
+          operator_allnamespaces_support: "{{ false if operator_allnamespaces_support == [] else operator_allnamespaces_support[0] }}"
+          operator_ownnamespace_support: "{{ false if operator_ownnamespace_support == [] else operator_ownnamespace_support[0] }}"
+          operator_singlenamespace_support: "{{ false if operator_singlenamespace_support == [] else operator_singlenamespace_support[0] }}"
+          operator_multinamespace_support: "{{ false if operator_multinamespace_support == [] else operator_multinamespace_support[0] }}"
 
-    - name: "Output all collected data to a yaml file in work dir"
-      template:
-        src: "parsed_operator_data.yml.j2"
-        dest: "{{ work_dir }}/parsed_operator_data.yml"
+      - name: "Output all collected data to a yaml file in work dir"
+        template:
+          src: "parsed_operator_data.yml.j2"
+          dest: "{{ work_dir }}/parsed_operator_data.yml"
     when:
       - (doic_skip_file_check is not defined) or (not doic_skip_file_check|bool)
 
-  - name: "Getting suggested-namespace from csv '{{ csv_file_path | basename}}'"
+  - name: "Getting suggested-namespace from csv '{{ csv_file_path | basename }}'"
     shell: "{{ yq_bin_path }} r {{ csv_file_path }} -t 'metadata.annotations.[operatorframework.io/suggested-namespace]'"
     register: operator_suggested_namespace_raw
     ignore_errors: true
@@ -177,7 +174,7 @@
     ignore_errors: true
     when:
       - operator_suggested_namespace_raw is defined
-      - operator_suggested_namespace_raw.stdout!=""
+      - operator_suggested_namespace_raw.stdout != ""
 
   - name: "Sets operator suggested-namespace from default'"
     set_fact:

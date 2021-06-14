@@ -33,8 +33,8 @@
       when:
         - check_verify_result|bool
         - courier_verify_result.rc != 0
-        # - permisive is not defined or not permisive|bool
-        - (strict_mode is defined and strict_mode|bool)
+        - strict_mode is defined
+        - strict_mode|bool
 
   when: not run_upstream|bool
 
@@ -65,7 +65,7 @@
       when:
         - check_verify_result|bool
         - courier_verify_upstream_result.rc != 0
-        # - permisive is not defined or not permisive|bool
-        - (strict_mode is defined and strict_mode|bool)
+        - strict_mode is defined
+        - strict_mode|bool
 
   when: run_upstream|bool

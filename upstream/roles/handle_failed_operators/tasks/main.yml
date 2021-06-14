@@ -29,11 +29,13 @@
       fetch: src=/tmp/operators_failed.yaml dest=/tmp/operators_failed-{{ inventory_hostname }}.yaml flat=yes
       when: operators_config_failed is defined
 
-    - debug:
+    - name: "Printing failed operator config"
+      debug:
         var: operators_config_failed
       when: operators_config_failed is defined
 
-    - debug:
+    - name: "Printing failed operator versions"
+      debug:
         var: bundle_add_failed_name_version
       when: bundle_add_failed_name_version is defined
 

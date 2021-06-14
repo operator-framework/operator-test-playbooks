@@ -232,7 +232,7 @@
 - name: "Set 'result_rc'"
   set_fact:
     result_rc: true
-  when: 
+  when:
     - boi_ia_rc.rc is defined
     - boi_ia_rc.rc == 0
     - rc_last|bool

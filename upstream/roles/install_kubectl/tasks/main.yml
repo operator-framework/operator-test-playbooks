@@ -3,7 +3,7 @@
     file:
       path: /usr/local/bin/kubectl
       state: absent
-    become: yes
+    become: true
     tags:
       - uninstall
 
@@ -37,7 +37,7 @@
         retries: 10
         delay: 15
         failed_when: kubectl_install_result is failure
-        become: yes
+        become: true
     tags:
       - install
       - image_build

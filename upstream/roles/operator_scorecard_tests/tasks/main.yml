@@ -3,14 +3,16 @@
   shell: "{{ yq_bin_path }} r {{ cr_path }} --tojson | {{ jq_bin_path }} --raw-output '.kind' | sed 's/ /_/g'"
   register: cr_kind_result
 
-- set_fact:
+- name: "Set cr kind"
+  set_fact:
     cr_kind: "{{ cr_kind_result.stdout }}"
 
 - name: "Get the CR name"
   shell: "{{ yq_bin_path }} r {{ cr_path }} --tojson | {{ jq_bin_path }} --raw-output '.metadata.name' | sed 's/ /_/g'"
   register: cr_name_result
 
-- set_fact:
+- name: "Set cr name"
+  set_fact:
     cr_name: "{{ cr_name_result.stdout }}"
 
 - name: "Process the osdk-scorecard template"
@@ -28,7 +30,8 @@
   shell: "cat {{ work_dir }}/{{ cr_kind }}-{{ cr_name }}-scorecard-results.json | {{ jq_bin_path }} '.results[] | select(.labels.suite == \"basic\") | select(.state == \"pass\").name' | wc -l"
   register: scorecard_results_passed_result
 
-- debug:
+- name: "Print scorecard result"
+  debug:
     msg: "Scorecard Basic Tests passed: {{ scorecard_results_passed_result.stdout }}"
 
 - name: "Delete the operator CR"

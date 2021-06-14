@@ -26,20 +26,20 @@
   set_fact:
     sis_missing_packages: "{{ input_packages | difference(output_packages) }}"
 
-- debug:
+- name: "Prints input packages"
+  debug:
     var: input_packages
 
-- debug:
+- name: "Prints output packages"
+  debug:
     var: output_packages
 
-- debug:
+- name: "Prints missing packages"
+  debug:
     var: sis_missing_packages
-
 
 - name: "Loop over missing packages"
   include_tasks: single_operator.yml
   loop: "{{ sis_missing_packages }}"
   loop_control:
     loop_var: si_item
-
-

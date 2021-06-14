@@ -2,7 +2,8 @@
 - name: "Docker installaion on ubuntu"
   block:
     - name: "Install aptitude using apt"
-      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+      apt: name=aptitude state=present update_cache=yes force_apt_get=yes
+
     - name: "Add Docker GPG apt Key"
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
@@ -14,8 +15,8 @@
         state: present
 
     - name: "Update apt and install docker-ce"
-      apt: update_cache=yes name=docker-ce state=latest
-  become: yes
+      apt: update_cache=yes name=docker-ce state=present
+  become: true
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
   tags:
     - install
@@ -31,8 +32,8 @@
     - name: "Install docker-ce"
       yum:
         name: docker-ce
-        state: latest
-  become: yes
+        state: present
+  become: true
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Fedora'
   tags:
     - install
@@ -42,7 +43,7 @@
   group:
     name: "{{ docker_group }}"
     state: present
-  become: yes
+  become: true
   tags:
     - install
     - host_build
@@ -51,8 +52,8 @@
   user:
     name: "{{ docker_user }}"
     groups: docker
-    append: yes
-  become: yes
+    append: true
+  become: true
   tags:
     - install
     - host_build
@@ -67,7 +68,7 @@
   service:
     name: docker
     state: started
-  become: yes
+  become: true
   tags:
     - install
     - host_build

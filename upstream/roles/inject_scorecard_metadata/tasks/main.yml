@@ -1,9 +1,7 @@
 ---
-- set_fact:
+- name: "Setting scorecard secret path"
+  set_fact:
     sc_secret_path: "{{ operator_work_dir }}/../scorecard.secret.yaml"
-
-- debug:
-    msg: "{{ testing_bin_path}}:{{ lookup('env', 'PATH') }}"
 
 - name: "Git clone community operators repo with the required bash functions"
   git:
@@ -65,7 +63,6 @@
   set_fact:
     csv_vars_spec_crds_owned: "{{ csv_vars_spec_crds['owned'] | default([]) }}"
 
-  # RUNS the following block only when csv_vars_spec_crds_owned is not empty
 - name: "Extract CR only when the CRs defined"
   block:
     - name: "Extract only the first CR from alm-examples in the CSV"

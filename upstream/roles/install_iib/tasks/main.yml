@@ -27,10 +27,7 @@
     - name: "Set the retry count"
       set_fact:
         iib_retry_count: 2
-
-  # Remove 'become: yes' in future would be nice
-  become: yes
+  become: true
   tags:
     - never
     - iib
-

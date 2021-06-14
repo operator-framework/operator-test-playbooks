@@ -1,6 +1,6 @@
 - name: "Setting annotation and label values for key '{{ item }}'"
   set_fact:
-    cal_annotation_value: "{{ annotations_vars.annotations[item]}}"
+    cal_annotation_value: "{{ annotations_vars.annotations[item] }}"
     cal_label_value: "{{ skopeo_inspect_json.Labels[item] }}"
 
 - name: "Check if the {{ item }} from annotation.yaml matches the bundle image label"
