@@ -29,7 +29,7 @@
     block:
       - name: "Parse uptime in seconds"
         set_fact:
-        operator_uptime: "{{ operator_uptime_raw.stdout.split('s')[0] }}"
+          operator_uptime: "{{ operator_uptime_raw.stdout.split('s')[0] }}"
 
       - name: "Uptime test result"
         set_fact:
