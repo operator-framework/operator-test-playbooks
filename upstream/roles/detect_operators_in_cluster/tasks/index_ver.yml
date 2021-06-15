@@ -1,5 +1,5 @@
 ---
-- name: "Set cluster version - checking {{ doic_allowed_versions }} #1"
+- name: "Task #1: Set cluster version - checking {{ doic_allowed_versions }} #1"
   set_fact:
     dov_cluster_ver: "{{ doic_allowed_versions }}"
     dov_operators_op_ver: []

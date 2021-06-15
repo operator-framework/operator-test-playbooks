@@ -1,6 +1,6 @@
 ---
-#2
-- set_fact:
+- name: "Task #2: init values"
+  set_fact:
     doic_final_list: []
     doic_final_list_bundles: []
     doic_final_list_versions_prod: []

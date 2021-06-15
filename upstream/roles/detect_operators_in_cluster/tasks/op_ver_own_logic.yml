@@ -1,9 +1,5 @@
 ---
-#3.1
-# unable to use Pyxis for `Push to quay` handling 4.5 index as appregistry
-# goal: set ptq_ready to false if does not comply with 4.5
-
-- name: "Set 4.5 as a target version"
+- name: "Task #3.1: Set 4.5 as a target version"
   set_fact:
     dov_cluster_ver: "4.5"
     ovol_appreg_supported: false

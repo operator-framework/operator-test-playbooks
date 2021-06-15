@@ -1,6 +1,5 @@
 ---
-#3
-- name: "Debug"
+- name: "Task #3: Show current run"
   debug:
     var: current_openshift_run
 - name: "Default standard detection"
