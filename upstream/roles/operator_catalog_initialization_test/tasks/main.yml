@@ -29,7 +29,8 @@
   register: catalog_manifests_dir_result
   ignore_errors: true
 
-- set_fact:
+- name: "Sets 'catalog_manifests_dir'"
+  set_fact:
     catalog_manifests_dir: "{{ catalog_manifests_dir_result.stdout_lines[0] }}"
   when:
     - catalog_manifests_dir_result.stdout_lines is defined
@@ -60,7 +61,7 @@
     content: "{{ catalog_initializer_result.stdout }}"
     dest: "{{ work_dir }}/catalog-init-debug-{{ operator_registry_branch }}.txt"
   when:
-    - catalog_initializer_result.stdout != ""
+    - catalog_initializer_result.stdout|length > 0
 
 - name: "Output the catalog initialization return code to a debug file"
   copy:

@@ -1,13 +1,7 @@
 ---
-- set_fact:
+- name: "Resets 'doic_full_list' list"
+  set_fact:
     doic_full_list: []
-
-#- name: "Convert allowed input versions to list"
-#  set_fact:
-#   ocs_allowed_versions: "{{ ocs_allowed_versions_in.split(',')}}"
-
-#- debug:
-#    var: ocs_allowed_versions
 
 - name: "Loop over all cluster versions"
   include_tasks: index_ver.yml
@@ -17,13 +11,8 @@
 
 - name: "Convert allowed input versions to list"
   set_fact:
-   boi_cluster_versions: "{{ doic_full_list }}"
+    boi_cluster_versions: "{{ doic_full_list }}"
 
 - name: "Get full list for index setup"
   debug:
     var: doic_full_list
-
-
-
-
-

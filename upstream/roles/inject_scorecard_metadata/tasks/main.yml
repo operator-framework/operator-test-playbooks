@@ -17,7 +17,7 @@
   args:
     executable: /bin/bash
   environment:
-    PATH: "{{ testing_bin_path}}:{{ lookup('env', 'PATH') }}"
+    PATH: "{{ testing_bin_path }}:{{ lookup('env', 'PATH') }}"
 
 - name: "Insert kubeconfig secret mount into the operator CSV"
   shell: |
@@ -26,7 +26,7 @@
   args:
     executable: /bin/bash
   environment:
-    PATH: "{{ testing_bin_path}}:{{ lookup('env', 'PATH') }}"
+    PATH: "{{ testing_bin_path }}:{{ lookup('env', 'PATH') }}"
 
 - name: "Insert scorecard-proxy container into the operator CSV"
   shell: |
@@ -35,7 +35,7 @@
   args:
     executable: /bin/bash
   environment:
-    PATH: "{{ testing_bin_path}}:{{ lookup('env', 'PATH') }}"
+    PATH: "{{ testing_bin_path }}:{{ lookup('env', 'PATH') }}"
 
 - name: "Create scorecard kubeconfig secret file"
   shell: |
@@ -44,7 +44,7 @@
   args:
     executable: /bin/bash
   environment:
-    PATH: "{{ testing_bin_path}}:{{ lookup('env', 'PATH') }}"
+    PATH: "{{ testing_bin_path }}:{{ lookup('env', 'PATH') }}"
 
 - name: "Load CSV into a csv_vars"
   include_vars:
@@ -76,6 +76,6 @@
       args:
         executable: /bin/bash
       environment:
-        PATH: "{{ testing_bin_path}}:{{ lookup('env', 'PATH') }}"
-      when: scorecard_first_cr|bool == false
+        PATH: "{{ testing_bin_path }}:{{ lookup('env', 'PATH') }}"
+      when: not scorecard_first_cr|bool
   when: csv_vars_spec_crds_owned | length > 0

@@ -59,7 +59,7 @@
   fail:
     msg: "Operator version 'operator_version' is undefined !!!"
   when:
-    - (operator_version is undefined or operator_version == "")
+    - (operator_version is undefined or operator_version|length == 0)
 
 - name: "Detect format"
   include_role:
@@ -192,7 +192,7 @@
             content: "{{ operator_container_result.stdout }}"
             dest: "{{ work_dir }}/scorecard-operator-container-debug.txt"
           when:
-            - operator_container_result.stdout != ""
+            - operator_container_result.stdout|length > 0
       when: not run_upstream|bool
 
     - name: "Test image sources of containers introduced with the testing operator"

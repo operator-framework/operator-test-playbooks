@@ -52,7 +52,7 @@
         msg: "CSV file '{{ csv_file_path }}' doesn't exists !!!"
       when: not csv_file_st.stat.exists
 
-    - name: "Getting metadata content from csv '{{ csv_file_path | basename}}'"
+    - name: "Getting metadata content from csv '{{ csv_file_path | basename }}'"
       shell: "{{ yq_bin_path }} r {{ csv_file_path }} -t metadata.name"
       register: csv_data_metadata_name
       ignore_errors: true
@@ -62,7 +62,7 @@
         msg: "Cannot parse 'metadata.name' from CSV file '{{ csv_file_path }}' !!!"
       when: csv_data_metadata_name.rc != 0
 
-    - name: "Getting metadata content from csv '{{ csv_file_path | basename}}'"
+    - name: "Getting metadata content from csv '{{ csv_file_path | basename }}'"
       shell: "{{ yq_bin_path }} r {{ csv_file_path }} -t metadata.annotations"
       register: csv_data_metadata_annotations
       ignore_errors: true
@@ -72,7 +72,7 @@
         msg: "Cannot parse 'metadata.annotations' from CSV file '{{ csv_file_path }}' !!!"
       when: csv_data_metadata_annotations.rc != 0
 
-    - name: "Getting spec content from csv '{{ csv_file_path | basename}}'"
+    - name: "Getting spec content from csv '{{ csv_file_path | basename }}'"
       shell: "{{ yq_bin_path }} r {{ csv_file_path }} -t spec"
       register: csv_data_spec
       ignore_errors: true

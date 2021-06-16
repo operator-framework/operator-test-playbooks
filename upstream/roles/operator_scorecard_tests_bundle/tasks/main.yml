@@ -9,8 +9,8 @@
     bundle_scorecard_test_config: "{{ work_dir }}/scorecard_config.yml"
     bundle_scorecard_test_select_args: "-l 'test in (basic-check-spec-test)'"
   when:
-    - (bundle_scorecard_test_config is undefined or bundle_scorecard_test_config == "")
-    - (bundle_scorecard_test_select is undefined or bundle_scorecard_test_select == "")
+    - (bundle_scorecard_test_config is undefined or bundle_scorecard_test_config|length == 0)
+    - (bundle_scorecard_test_select is undefined or bundle_scorecard_test_select|length == 0)
 
 - name: "Process the scorecard config template"
   template:
@@ -22,7 +22,7 @@
     bundle_scorecard_test_select_args: "-l 'test in ({{ bundle_scorecard_test_select }})'"
   when:
     - bundle_scorecard_test_select is defined
-    - bundle_scorecard_test_select != ""
+    - bundle_scorecard_test_select|length > 0
 
 - name: "Run operator-sdk scorecard tests on the deployed operator in json form"
   shell: "{{ operator_sdk_bin_path }} alpha scorecard {{ bundle_image }} -c {{ bundle_scorecard_test_config }} {{ bundle_scorecard_test_select_args }}"

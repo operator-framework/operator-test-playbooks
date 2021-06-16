@@ -45,4 +45,4 @@
         op_version: "{{ operator_vars.metadata.name.split('.v')[1:] | join('.') }}"
   when:
     - operator_input_image is defined
-    - operator_input_image != ""
+    - operator_input_image|length > 0

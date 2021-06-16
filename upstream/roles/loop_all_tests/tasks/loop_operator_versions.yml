@@ -1,4 +1,3 @@
-
 - name: "Loop over all versions in operator {{ lat_op.name }} (bundle test)"
   include_role:
     name: loop_all_test_single

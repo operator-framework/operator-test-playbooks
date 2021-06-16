@@ -1,5 +1,5 @@
-bundle_input_tmp_dir:  "/tmp/operator-test/operator-bundle-input/tmp"
-bundle_input_src_dir:  "/tmp/operator-test/operator-bundle-input/src"
+bundle_input_tmp_dir: "/tmp/operator-test/operator-bundle-input/tmp"
+bundle_input_src_dir: "/tmp/operator-test/operator-bundle-input/src"
 operator_base_dir: ""
 operator_bundle_src_dir: "/tmp/operator-test/operator-bundle/src"
 required_annotations:

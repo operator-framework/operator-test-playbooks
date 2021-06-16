@@ -9,7 +9,7 @@
       shell: 'echo "FROM {{ fqp_image }}" | {{ container_tool }} build --label quay.expires-after="15h" -t "{{ fqp_image }}" -'
       when:
         - openshift_robot_hash is defined
-        - openshift_robot_hash != ""
+        - openshift_robot_hash|length > 0
         - openshift_robot_hash.startswith('quay.io')
 
     - name: "Push image '{{ fqp_image }}' to quay using podman"
@@ -54,4 +54,4 @@
       when: not (opm_container_tool == "podman" and (fqp_image is search("quay.io/.*")))
 
   when:
-    - (fqp_image is defined and fqp_image != "")
+    - (fqp_image is defined and fqp_image|length > 0)

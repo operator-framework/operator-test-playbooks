@@ -12,31 +12,30 @@
 
 - name: "Pass operator versions to loop"
   set_fact:
-#    versions_processing: "{{ doic_operators_for_index.versions }}"
     doic_bundles_processing: "{{ doic_operators_for_index.bundles }}"
 
-- fail:
+- name: "Faile when 'doic_bundles_processing' is empty"
+  fail:
     msg: "Versions for {{ dov_op_name }} not defined"
-  when: doic_bundles_processing == ""
+  when: doic_bundles_processing|length == 0
 
 - name: "Loop over all operator versions"
   include_tasks: op_ver.yml
-#  loop: "{{ versions_processing }}"
   loop: "{{ doic_bundles_processing }}"
   loop_control:
-#    loop_var: doic_versions_processing
     loop_var: lc_doic_bundles_processing
 
-- debug:
+- name: "Prints 'doic_final_list'"
+  debug:
     var:
       - doic_final_list
 
-- debug:
+- name: "Prints 'doic_full_list'"
+  debug:
     var:
       - doic_full_list
 
 - name: "{{ dov_cluster_ver }} {{ dov_op_name }}: Adding versions"
   set_fact:
-   dov_operators_op_ver: "{{ dov_operators_op_ver | default([]) | union( [{'name': dov_op_name, 'versions': doic_final_list, 'bundles': doic_final_list_bundles, 'versions_prod': doic_final_list_versions_prod }]) }}"
+    dov_operators_op_ver: "{{ dov_operators_op_ver | default([]) | union( [{'name': dov_op_name, 'versions': doic_final_list, 'bundles': doic_final_list_bundles, 'versions_prod': doic_final_list_versions_prod }]) }}"
   when: (doic_final_list|length>0)
-

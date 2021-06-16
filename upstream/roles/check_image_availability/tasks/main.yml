@@ -27,12 +27,7 @@
 
   when: not run_upstream|bool
 
-- debug:
-    var: yq_bin_path
-- debug:
-    var: csv_file_path
-
-- name: "Getting external image from csv '{{ csv_file_path | basename}}'"
+- name: "Getting external image from csv '{{ csv_file_path | basename }}'"
   shell: "{{ yq_bin_path }} r {{ csv_file_path }} -t metadata.annotations.containerImage"
   register: operator_external_image_raw
   ignore_errors: true
@@ -60,7 +55,7 @@
       set_fact:
         vob_annotation_image_count_stdout: "{{ vob_annotation_image_count.stdout }}"
       when:
-        - vob_annotation_image_count is defined and vob_annotation_image_count!=""
+        - vob_annotation_image_count is defined and vob_annotation_image_count|length > 0
 
     - name: "Print err message"
       fail:
@@ -103,4 +98,4 @@
 
   when:
     - operator_external_image is defined
-    - operator_external_image != ""
+    - operator_external_image|length > 0

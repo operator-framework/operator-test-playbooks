@@ -12,7 +12,7 @@
     - ocp_version_annotation is defined
     - ocp_version_annotation.stdout is defined
     - ocp_version_annotation.stdout!='null'
-    - ocp_version_annotation.stdout!=''
+    - ocp_version_annotation.stdout|length > 0
     - annotations_file_path_presence.stat.exists
   set_fact:
     ocp_version_annotation_stdout: "{{ ocp_version_annotation.stdout }}"

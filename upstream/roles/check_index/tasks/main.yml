@@ -45,7 +45,7 @@
         msg: "Want to see {{ playbook_repo_test_want_missing_operator }} in 'chi_git_not_index_operators'"
       when:
         - playbook_repo_test_want_missing_operator is defined
-        - playbook_repo_test_want_missing_operator != ""
+        - playbook_repo_test_want_missing_operator|length > 0
         - playbook_repo_test_want_missing_operator is not in chi_git_not_index_operators
 
     - name: "Printing operators stat after clening"
@@ -108,20 +108,19 @@
             msg: "Number of missing operators is higher than {{ max_missing_operators_allowed }} - manual check is needed. Index overwrite safety check #2."
           when:
             - max_missing_operators_allowed is defined
-            - max_missing_operators_allowed != ""
+            - max_missing_operators_allowed|length > 0
             - chi_uncomplete_packages|length>(max_missing_operators_allowed|int)
 
       when:
         - bundles_namespace is defined
-        - bundles_namespace != ""
+        - bundles_namespace|length > 0
         - quay_api_token is defined
-        - quay_api_token != ""
+        - quay_api_token|length > 0
 
   tags:
     - deploy_bundles
     - index_check
   when:
     - bundle_index_image is defined
-    - bundle_index_image != ""
+    - bundle_index_image|length > 0
     - bundle_index_image is not search("kind-registry:5000/.*")
-

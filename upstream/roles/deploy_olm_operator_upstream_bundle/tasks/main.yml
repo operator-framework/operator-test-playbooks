@@ -6,7 +6,7 @@
 - name: "Set defaults"
   set_fact:
     quay_release: "0.0.1"
-    upstream_namespace_param: ''
+    upstream_namespace_param: ""
     olm_operator_files_path: /tmp/operator-test/olm-operator-files
 
 - name: "Set custom namespace command"
@@ -14,14 +14,14 @@
     upstream_namespace_param: "-n {{ operator_suggested_namespace }}"
   when:
     - run_upstream|bool
-    - operator_suggested_namespace!=""
+    - operator_suggested_namespace|length > 0
 
 - name: "Set custom namespace command"
   set_fact:
     upstream_namespace_param: "-n {{ operator_suggested_namespace_default }}"
   when:
     - run_upstream|bool
-    - operator_suggested_namespace==""
+    - operator_suggested_namespace|length == 0
 
 - name: "Create the olm operator files directory"
   file:
@@ -128,19 +128,22 @@
   copy:
     content: "{{ csv_describe_result.stdout }}"
     dest: "{{ work_dir }}/olm-operator-csv-debug.txt"
-  when: csv_describe_result.stdout != ""
+  when: csv_describe_result.stdout|length > 0
   no_log: true
 
-- debug:
+- name: "Prints operator results rc"
+  debug:
     var: operator_result.rc
-- debug:
+
+- name: "Prints operator results raw rc"
+  debug:
     var: operator_uptime_raw_rc
 
 - name: "Print CSV in case of an error"
   debug:
     var: csv_describe_result.stdout
   when:
-    - csv_describe_result.stdout != ""
+    - csv_describe_result.stdout|length > 0
     - operator_result.rc != 0 or operator_uptime_raw_rc|int != 0 or operator_uptime_raw_rc is not defined
 
 - name: "Get the pod status of the deployed operator"
@@ -149,7 +152,7 @@
   ignore_errors: true
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
-  when: csv_describe_result.stdout != ""
+  when: csv_describe_result.stdout|length > 0
   no_log: true
 
 - name: "Output the operator pod log to a debug file"
@@ -157,16 +160,16 @@
     content: "{{ operator_pod_result.stdout }}"
     dest: "{{ work_dir }}/olm-operator-pod-debug.txt"
   when:
-    - csv_describe_result.stdout != ""
-    - operator_pod_result.stdout != ""
+    - csv_describe_result.stdout|length > 0
+    - operator_pod_result.stdout|length > 0
   no_log: true
 
 - name: "Print operator pod log in case of an error"
   debug:
     var: operator_pod_result.stdout
   when:
-    - csv_describe_result.stdout != ""
-    - operator_pod_result.stdout != ""
+    - csv_describe_result.stdout|length > 0
+    - operator_pod_result.stdout|length > 0
     - operator_result.rc != 0 or operator_uptime_raw_rc|int != 0 or operator_uptime_raw_rc is not defined
 
 - name: "Get the pod container logs of the deployed operator"
@@ -175,7 +178,7 @@
   ignore_errors: true
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
-  when: csv_describe_result.stdout != ""
+  when: csv_describe_result.stdout|length > 0
   no_log: true
 
 - name: "Output the operator container log to a debug file"
@@ -183,16 +186,16 @@
     content: "{{ operator_container_result.stdout }}"
     dest: "{{ work_dir }}/olm-operator-container-debug.txt"
   when:
-    - csv_describe_result.stdout != ""
-    - operator_container_result.stdout != ""
+    - csv_describe_result.stdout|length > 0
+    - operator_container_result.stdout|length > 0
   no_log: true
 
 - name: "Print operator container log in case of an error"
   debug:
     var: operator_container_result.stdout
   when:
-    - csv_describe_result.stdout != ""
-    - operator_container_result.stdout != ""
+    - csv_describe_result.stdout|length > 0
+    - operator_container_result.stdout|length > 0
     - operator_result.rc != 0 or operator_uptime_raw_rc|int != 0 or operator_uptime_raw_rc is not defined
 
 - name: "Get the catalogsource pod log (upstream)"

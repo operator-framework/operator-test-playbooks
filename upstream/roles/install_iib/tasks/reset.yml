@@ -36,7 +36,7 @@
         replace: "    iib_registry = '{{ iib_push_registry }}'"
       when:
         - iib_push_registry is defined
-        - iib_push_registry != ""
+        - iib_push_registry|length > 0
 
     - name: "Replace 'iib_image_push_template' for to push to quay directly"
       replace:
@@ -45,7 +45,7 @@
         replace: "    iib_image_push_template = '{{ iib_push_image }}'"
       when:
         - iib_push_image is defined
-        - iib_push_image != ""
+        - iib_push_image|length > 0
 
     - name: "Remove previous iib installation"
       shell:

@@ -49,12 +49,12 @@
       no_log: true
       when:
         - openshift_robot_hash is defined
-        - openshift_robot_hash != ""
+        - openshift_robot_hash|length > 0
 
     - name: "Quay login via auth token"
       shell: "{{ container_tool }} login -u=\\$oauthtoken -p={{ openshift_robot_hash_array[1] }} quay.io"
       no_log: true
-      when: (quay_user is undefined or quay_password is undefined or quay_user == "" or quay_password == "") and openshift_robot_hash_array.1 is defined and openshift_robot_hash_array.1 != ""
+      when: (quay_user is undefined or quay_password is undefined or quay_user|length == 0 or quay_password|length == 0) and openshift_robot_hash_array.1 is defined and openshift_robot_hash_array.1|length > 0
 
     - name: "Generate Operators config file from all operators"
       block:
@@ -95,11 +95,11 @@
           with_items: "{{ recreate_repos_list }}"
           when:
             - quay_api_token is defined
-            - quay_api_token != ""
+            - quay_api_token|length > 0
             - (recreate_skip_repo_clean is undefined or not recreate_skip_repo_clean|bool)
       when:
         - regenerate_operators_path is defined
-        - regenerate_operators_path != ""
+        - regenerate_operators_path|length > 0
 
     - debug:
         var: operators
@@ -115,13 +115,13 @@
 
         - name: "Set facts from config variables"
           set_fact:
-            operators: "{{ operators_config_vars.operators | default([])}}"
+            operators: "{{ operators_config_vars.operators | default([]) }}"
             operator_base_dir: "{{ operators_config_vars.operator_base_dir | default('') }}"
 
         - name: "Failing when 'operator base dir' is not found in '{{ operators_config }}'"
           fail:
             msg: "'operator_base_dir' was not found in config file '{{ operators_config }}' !!!"
-          when: operator_base_dir == ""
+          when: operator_base_dir|length == 0
 
         - name: "Checking if operator base dir exists"
           stat:
@@ -136,7 +136,7 @@
         - name: "Failing when 'operator_base_dir' is not defined or is empty"
           fail:
             msg: "The 'operator_base_dir' is not defined or is empty"
-          when: operator_base_dir == ""
+          when: operator_base_dir|length == 0
       when: operators_config is defined
 
     - name: "Set operator name to list from operator name"
@@ -191,8 +191,8 @@
       when:
         - run_upstream|bool
         - bundle_index_image is defined
-        - bundle_index_image != ""
-        - (openshift_robot_hash is undefined or openshift_robot_hash == "")
+        - bundle_index_image|length > 0
+        - (openshift_robot_hash is undefined or openshift_robot_hash|length == 0)
 
     - name: "Mirror index image"
       include_role:
@@ -206,11 +206,11 @@
       when:
         - run_upstream|bool
         - bundle_index_image is defined
-        - bundle_index_image != ""
+        - bundle_index_image|length > 0
         - mirror_index_images is defined
-        - mirror_index_images != ""
+        - mirror_index_images|length > 0
         - mirror_apply|bool
-        - (openshift_robot_hash is undefined or openshift_robot_hash == "")
+        - (openshift_robot_hash is undefined or openshift_robot_hash|length == 0)
 
     - name: "Handle failed operators"
       include_role:
@@ -222,7 +222,7 @@
         - index_check
       when:
         - run_upstream|bool
-        - (openshift_robot_hash is undefined or openshift_robot_hash == "")
+        - (openshift_robot_hash is undefined or openshift_robot_hash|length == 0)
 
     - name: "Push to Quay (old AppRegistry)"
       include_role:
@@ -231,4 +231,4 @@
       when:
         - run_upstream|bool
         - quay_appregistry_courier_token is defined
-        - quay_appregistry_courier_token != ""
+        - quay_appregistry_courier_token|length > 0

@@ -4,7 +4,7 @@
     dov_op_name: "{{ cic_chi_git_not_index_operator.split(':')[0] }}"
     doic_versions_processing: "{{ cic_chi_git_not_index_operator.split(':v')[1] }}"
     ptq_ready: false
-    ocp_version_annotation_stdout:
+    ocp_version_annotation_stdout: ""
 
 - name: "Set path to the file containing labels for version {{ doic_versions_processing }}"
   set_fact:
@@ -32,7 +32,7 @@
     name: detect_operators_in_cluster
     tasks_from: op_ver.yml
   when:
-    - ocp_version_annotation_stdout != ""
+    - ocp_version_annotation_stdout|length > 0
     - annotations_file_path_presence.stat.exists
     - quay_appregistry_courier_token is not defined
     - not ptq_ready|bool
@@ -42,7 +42,7 @@
     name: detect_operators_in_cluster
     tasks_from: op_ver_own_logic.yml
   when:
-    - ocp_version_annotation_stdout != ""
+    - ocp_version_annotation_stdout|length > 0
     - annotations_file_path_presence.stat.exists
     - quay_appregistry_courier_token is defined
     - not ptq_ready|bool

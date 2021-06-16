@@ -81,7 +81,7 @@
         - check_validation_result|bool
         - sdk_validation_upstream_result.rc != 0
 
-    - name: "Getting categories content from csv '{{ csv_file_path | basename}}'"
+    - name: "Getting categories content from csv '{{ csv_file_path | basename }}'"
       shell: "{{ yq_bin_path }} r {{ csv_file_path }} -t metadata.annotations.categories"
       register: csv_data_metadata_annotations_categories
       ignore_errors: true
@@ -100,7 +100,7 @@
     - name: "Failing when 'categories' are empty'"
       fail:
         msg: "An empty value found - 'metadata.annotations.categories'"
-      when: vob_categories == ""
+      when: vob_categories|length == 0
 
     - name: "Handle permissive mode when operator is failing to deploy on kind cluster"
       set_fact:

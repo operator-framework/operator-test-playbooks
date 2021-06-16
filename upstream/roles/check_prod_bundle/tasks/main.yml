@@ -2,7 +2,7 @@
 - name: "Failing when 'production_registry_namespace' is missing"
   fail:
     msg: "The 'production_registry_namespace' variable is missing. Please set it via '-e production_registry_namespace=<registry/namespace>'"
-  when: production_registry_namespace is undefined or production_registry_namespace == ""
+  when: production_registry_namespace is undefined or production_registry_namespace|length == 0
 
 - name: "Setting 'operator_dir_name'"
   set_fact:

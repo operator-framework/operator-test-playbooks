@@ -17,7 +17,7 @@
         gaotd_operator_packages: "{{ gaotd_operators_find.files | map(attribute='path') | map('basename') | list | sort }}"
   when:
     - operator_base_dir is defined
-    - operator_base_dir != ""
+    - operator_base_dir|length > 0
 
 - name: "Getting all operators from index image '{{ bundle_index_image }}'"
   block:
@@ -32,17 +32,17 @@
         gaotd_operator_dirs: []
         gaotd_operator_packages: "{{ elopfi_index_packages }}"
   when:
-    - (operator_base_dir is undefined or operator_base_dir == "")
+    - (operator_base_dir is undefined or operator_base_dir|length == 0)
     - bundle_index_image is defined
-    - bundle_index_image != ""
+    - bundle_index_image|length > 0
 
 - name: "Setting list of all operators"
   fail:
     msg: "Missing variables : 'operator_base_dir' or 'bundle_index_image' !!!"
     gaotd_operator_packages: "{{ gaotd_operators_find.files | map(attribute='path') | map('basename') | list | sort }}"
   when:
-    - (operator_base_dir is undefined or operator_base_dir == "")
-    - (bundle_index_image is undefined or bundle_index_image == "")
+    - (operator_base_dir is undefined or operator_base_dir|length == 0)
+    - (bundle_index_image is undefined or bundle_index_image|length == 0)
 
 - name: "Search over all operator versions"
   block:
@@ -62,4 +62,3 @@
   when:
     - gaotd_operator_dirs.0 is defined
     - gaotd_include_versions|bool
-

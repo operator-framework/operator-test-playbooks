@@ -12,7 +12,7 @@
 
 - name: "Reset value for unified package test"
   set_fact:
-    previous_package: ''
+    previous_package: ""
 
 - name: "Export Package variables"
   block:
@@ -36,7 +36,7 @@
 - name: "Fail when no packaage name was found for '{{ operator_dir | basename }}' operator"
   fail:
     msg: "No package name was found for operator '{{ operator_dir | basename }}'"
-  when: previous_package == ''
+  when: previous_package|length == 0
 
 - name: "Fail if package name is different then operator dir name"
   fail:
@@ -47,4 +47,4 @@
 
 - name: "Reset value for unified package test"
   set_fact:
-    previous_package: ''
+    previous_package: ""

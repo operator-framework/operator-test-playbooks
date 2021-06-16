@@ -58,7 +58,7 @@
 
       when:
         - min_operators_in_index_allowed is defined
-        - min_operators_in_index_allowed != ""
+        - min_operators_in_index_allowed|length > 0
         - elopfi_index_packages|length<(min_operators_in_index_allowed|int)
 
   tags:
@@ -66,4 +66,4 @@
     - index_check
   when:
     - bundle_index_image_input is defined
-    - bundle_index_image_input != ""
+    - bundle_index_image_input|length > 0

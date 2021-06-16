@@ -10,7 +10,7 @@
       updateGraph: "semver"
   when: not ci_yaml_file_st.stat.exists
 
-- name: "Getting content from ci.yaml '{{ ecy_path | basename}}'"
+- name: "Getting content from ci.yaml '{{ ecy_path | basename }}'"
   shell: "cat {{ ecy_path }}"
   register: ci_data_updateGraph
   ignore_errors: true

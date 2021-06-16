@@ -33,13 +33,13 @@
   shell: "curl https://mirror.openshift.com/pub/openshift-v4/clients/oc/{{ oc_version_test }}/linux/oc.tar.gz | tar xvzf - -C /tmp/oc-{{ dir_suffix_part }}/bin oc --skip-old-files"
   when:
     - dir_suffix_part is defined
-    - dir_suffix_part != ""
+    - dir_suffix_part|length > 0
 
 - name: "Chmod"
   shell: "chmod ug+x /tmp/oc-{{ dir_suffix_part }}/bin/oc"
   when:
     - dir_suffix_part is defined
-    - dir_suffix_part != ""
+    - dir_suffix_part|length > 0
 
 - name: "Check operator external image availability"
   include_role:
@@ -88,13 +88,15 @@
 - name: "Check suggested_namespace"
   include_tasks: get_namespace.yml
 
-- set_fact:
+- name: "Sets index image test"
+  set_fact:
     index_image_test: "quay.io/{{ test_quay_namespace }}/catalog:{{ commit_tag }}"
 
 - name: "Check if commit hash {{ commit_tag }} is present as bundle test version"
   shell: "curl -X GET https://quay.io/api/v1/repository/{{ test_quay_namespace }}/{{ package_name }}|grep {{ commit_tag }}"
 
-- set_fact:
+- name: "Sets index_image_test_no_ver"
+  set_fact:
     index_image_test_no_ver: "quay.io/operator_testing/{{ package_name }}"
 
 - name: "Get bundle image tag sha"
@@ -150,7 +152,7 @@
     current_csv: "{{ operator_vars.metadata.name }}"
     operator_pod_name: "{{ operator_vars.spec.install.spec.deployments[0].name }}"
     operator_container_name: "{{ operator_vars.spec.install.spec.deployments[0].spec.template.spec.containers[0].name }}"
-    operator_capabilities: "{{ operator_vars.metadata.annotations.capabilities | default('Basic Install')}}"
+    operator_capabilities: "{{ operator_vars.metadata.annotations.capabilities | default('Basic Install') }}"
 
 - name: "Determine operator_allnamespaces_support"
   set_fact:
@@ -330,7 +332,7 @@
   copy:
     content: "{{ dooou_get_sub_result.stdout }}"
     dest: "{{ work_dir }}/dooou_get_sub_result.txt"
-  when: dooou_get_sub_result.stdout != ""
+  when: dooou_get_sub_result.stdout|length > 0
   ignore_errors: true
 
 - name: "Append error output to get pods log"
@@ -351,7 +353,7 @@
   copy:
     content: "{{ dooou_get_pods_result.stdout }}"
     dest: "{{ work_dir }}/dooou_get_operatorgroup_result.txt"
-  when: dooou_get_operatorgroup_result.stdout != ""
+  when: dooou_get_operatorgroup_result.stdout|length > 0
   ignore_errors: true
 
 - name: "Append error output to get pods log"
@@ -372,7 +374,7 @@
   copy:
     content: "{{ dooou_get_pods_result.stdout }}"
     dest: "{{ work_dir }}/dooou_get_pods_result.txt"
-  when: dooou_get_pods_result.stdout != ""
+  when: dooou_get_pods_result.stdout|length > 0
   ignore_errors: true
 
 - name: "Append error output to get pods log"
@@ -393,7 +395,7 @@
   copy:
     content: "{{ dooou_get_deployments_result.stdout }}"
     dest: "{{ work_dir }}/dooou_get_deployments_result.txt"
-  when: dooou_get_deployments_result.stdout != ""
+  when: dooou_get_deployments_result.stdout|length > 0
   ignore_errors: true
 
 - name: "Append error output to get deployments log"
@@ -414,7 +416,7 @@
   copy:
     content: "{{ csv_describe_result.stdout }}"
     dest: "{{ work_dir }}/olm-operator-csv-debug.txt"
-  when: csv_describe_result.stdout != ""
+  when: csv_describe_result.stdout|length > 0
   ignore_errors: true
 
 - name: "Append error output to CSV log"
@@ -430,15 +432,15 @@
   ignore_errors: true
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
-  when: csv_describe_result.stdout != ""
+  when: csv_describe_result.stdout|length > 0
 
 - name: "Output the operator pod log to a debug file"
   copy:
     content: "{{ operator_pod_result.stdout }}"
     dest: "{{ work_dir }}/olm-operator-pod-debug.txt"
   when:
-    - csv_describe_result.stdout != ""
-    - operator_pod_result.stdout != ""
+    - csv_describe_result.stdout|length > 0
+    - operator_pod_result.stdout|length > 0
   ignore_errors: true
 
 - name: "Append error output to operator pod log"
@@ -453,7 +455,7 @@
   register: operator_container_result
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
-  when: csv_describe_result.stdout != ""
+  when: csv_describe_result.stdout|length > 0
   ignore_errors: true
 
 - name: "Output the operator container log to a debug file"
@@ -461,8 +463,8 @@
     content: "{{ operator_container_result.stdout }}"
     dest: "{{ work_dir }}/olm-operator-container-debug.txt"
   when:
-    - csv_describe_result.stdout != ""
-    - operator_container_result.stdout != ""
+    - csv_describe_result.stdout|length > 0
+    - operator_container_result.stdout|length > 0
   ignore_errors: true
 
 - name: "Append error output to operator container log"
@@ -585,7 +587,8 @@
   register: debug_output_time_general
   ignore_errors: true
 
-- set_fact:
+- name: "Sets 'olm_operator_files_path'"
+  set_fact:
     olm_operator_files_path: "{{ olm_operator_files_path_core }}"
 
 - name: "Cleanup created resources on the KIND cluster"

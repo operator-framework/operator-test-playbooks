@@ -14,7 +14,8 @@
 
 - name: "Read the variables from annotations.yaml"
   block:
-    - shell: cat "{{ operator_work_dir }}/metadata/annotations.yaml"
+    - name: "Get content of annotations.yaml file"
+      shell: cat "{{ operator_work_dir }}/metadata/annotations.yaml"
       register: annotation_data
 
     - name: "Seting annotation variables"

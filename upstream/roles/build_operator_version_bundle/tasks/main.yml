@@ -12,7 +12,7 @@
       failed_when: false
   when:
     - operator_input_image is defined
-    - operator_input_image != ""
+    - operator_input_image|length > 0
 
 - name: "Handle bundle image from source dir"
   block:
@@ -109,15 +109,16 @@
         - operator_format == "manifest"
         - operator_channels_list.0 is defined
 
-    - fail:
+    - name: "Faile when default channel is missing"
+      fail:
         msg: "Multiple channels defined and 'defaultChannel' is missing !!!"
       when:
         - operator_channel_force is defined
-        - operator_channel_force == ""
+        - operator_channel_force|length == 0
         - op_manifest_pkg_vars is defined
         - operator_channels_list is defined
         - operator_channels_list|length > 1
-        - op_manifest_pkg_vars.defaultChannel is undefined or op_manifest_pkg_vars.defaultChannel == ""
+        - op_manifest_pkg_vars.defaultChannel is undefined or op_manifest_pkg_vars.defaultChannel|length == 0
 
     # we tolerate no default_channel in case the only channel
     - name: "Setting 'operator_channel_default'"
@@ -133,7 +134,7 @@
         operator_channel_default: "{{ operator_channel_force }}"
       when:
         - operator_channel_force is defined
-        - operator_channel_force != ""
+        - operator_channel_force|length > 0
         - operator_format == "manifest"
 
     - name: "Ensure replaces is removed in this test"
@@ -159,9 +160,15 @@
 
     - name: "The first operator has no package conflict"
       set_fact:
+        previous_package: ""
+      when:
+        - previous_package is undefined
+
+    - name: "The first operator has no package conflict"
+      set_fact:
         previous_package: "{{ operator_package_name }}"
       when:
-        - previous_package == ''
+        - previous_package|length == 0
 
     - name: "Fail if operators in one dir are not related to the only package"
       fail:
@@ -177,7 +184,7 @@
         bundle_image: "{{ openshift_robot_hash_array[0] }}/{{ operator_package_name }}:{{ openshift_robot_hash_array[2] }}"
       when:
         - openshift_robot_hash_array.2 is defined
-        - openshift_robot_hash_array.2 != ""
+        - openshift_robot_hash_array.2|length > 0
 
 
     - name: "Handle situation when bundle force rebuild"
@@ -253,7 +260,7 @@
                 - name: "Fail if value of 'operators.operatorframework.io.test.config.v1' is empty "
                   fail:
                     msg: "Value 'operators.operatorframework.io.test.config.v1' form annotations.yaml file is empty"
-                  when: annotations_vars.annotations['operators.operatorframework.io.test.config.v1'] == ""
+                  when: annotations_vars.annotations['operators.operatorframework.io.test.config.v1']|length == 0
 
                 - name: "Check if directory exits"
                   stat:
@@ -406,4 +413,4 @@
       when: (bb_rc.rc is defined and bb_rc.rc != 0) or (mb_rc.rc is defined and mb_rc.rc != 0)
 
   when:
-    - operator_input_image == ""
+    - operator_input_image|length == 0

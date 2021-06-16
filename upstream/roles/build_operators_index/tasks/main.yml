@@ -11,7 +11,7 @@
     bundle_index_image: "{{ openshift_robot_hash_array[0] }}/{{ bundle_index_image_name }}:{{ openshift_robot_hash_array[2] }}"
   when:
     - openshift_robot_hash_array.2 is defined
-    - openshift_robot_hash_array.2 != ""
+    - openshift_robot_hash_array.2|length > 0
 
 # - name: "Remove index image '{{ bundle_index_image }}'"
 #   shell: "{{ container_tool }} rmi -f {{ bundle_index_image }}"

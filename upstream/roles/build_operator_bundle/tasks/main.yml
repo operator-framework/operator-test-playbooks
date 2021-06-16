@@ -70,7 +70,7 @@
       changed_when: false
       when:
         - production_registry_namespace is defined
-        - production_registry_namespace != ""
+        - production_registry_namespace|length > 0
 
     - name: "Create repo with public visibility"
       uri:
@@ -85,7 +85,7 @@
         return_content: true
       when:
         - quay_api_token is defined
-        - quay_api_token != ""
+        - quay_api_token|length > 0
         - bob_registry_versions.status != 200
 
     - name: "Get list of versions_in_dir from bundle registry"
@@ -96,7 +96,7 @@
       changed_when: false
       when:
         - openshift_robot_hash_array.1 is defined
-        - openshift_robot_hash_array.1 != ""
+        - openshift_robot_hash_array.1|length > 0
 
     - name: "Create repo with public visibility (openshift robot)"
       uri:
@@ -111,7 +111,7 @@
         return_content: true
       when:
         - openshift_robot_hash_array.1 is defined
-        - openshift_robot_hash_array.1 != ""
+        - openshift_robot_hash_array.1|length > 0
         - bob_registry_versions_osr.status != 200
 
     - name: "Reseting 'versions_in_registry' variable"
@@ -158,7 +158,7 @@
                 - ( bundle_force_rebuild is undefined or bundle_force_rebuild|bool == false)
           when:
             - production_registry_namespace is defined
-            - production_registry_namespace != ""
+            - production_registry_namespace|length > 0
 
         - name: "Filtering versions to add and remove for only 'operator_version' : '{{ operator_version }}' specified by user"
           set_fact:
@@ -190,13 +190,13 @@
       with_items: "{{ versions_remove }}"
       when:
         - quay_api_token is defined
-        - quay_api_token != ""
+        - quay_api_token|length > 0
         - versions_remove.0 is defined
-        - versions_remove.0 != ""
+        - versions_remove.0|length > 0
 
     - name: "Reset value for unified package test"
       set_fact:
-        previous_package: ''
+        previous_package: ""
 
     - name: "Build bundle image"
       include_role:
@@ -209,7 +209,7 @@
 
     - name: "Setting tmp bundle versions without production versions"
       set_fact:
-        bob_versions_tmp: "{{ versions_in_dir | difference(versions_in_prod_registry)}}"
+        bob_versions_tmp: "{{ versions_in_dir | difference(versions_in_prod_registry) }}"
 
     - name: "Setting empty bundles array"
       set_fact:
@@ -221,7 +221,7 @@
       with_items: "{{ versions_in_prod_registry }}"
       when:
         - production_registry_namespace is defined
-        - production_registry_namespace != ""
+        - production_registry_namespace|length > 0
 
     - name: "Filling bundle versions for operator '{{ operator_package_name }}'"
       set_fact:
@@ -233,7 +233,7 @@
         bob_bundles_arr: "[ '{{ openshift_robot_hash_array[0] }}/{{ operator_package_name }}:{{ openshift_robot_hash_array[2] }}' ]"
       when:
         - openshift_robot_hash_array.2 is defined
-        - openshift_robot_hash_array.2 != ""
+        - openshift_robot_hash_array.2|length > 0
 
     - name: "Adding current operator to the 'operators_for_index'"
       set_fact:

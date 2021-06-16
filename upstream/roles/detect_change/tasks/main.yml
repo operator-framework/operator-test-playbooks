@@ -43,7 +43,7 @@
       block:
         - name: "Path according package manifest format"
           set_fact:
-            dc_master_csv_file_path: "{{ dc_csv_file_end | replace('manifests/','')}}"
+            dc_master_csv_file_path: "{{ dc_csv_file_end | replace('manifests/','') }}"
 
         - debug:
             var: dc_master_csv_file_path
@@ -104,7 +104,7 @@
                 dc_changes_all: "{{ dc_diff_keys_result.stdout.splitlines()|list }}"
               when:
                 - dc_diff_keys_result.stdout is defined
-                - dc_diff_keys_result.stdout!=""
+                - dc_diff_keys_result.stdout|length > 0
 
             - debug:
                 var: dc_changes_all

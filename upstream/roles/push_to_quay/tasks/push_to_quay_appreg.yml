@@ -35,15 +35,15 @@
       when:
         - quay_user is defined
         - quay_password is defined
-        - quay_user != ""
-        - quay_password != ""
+        - quay_user|length > 0
+        - quay_password|length > 0
 
     - name: "Setting 'index export' container option"
       set_fact:
         ptq_index_args: "-c {{ opm_container_tool_index }}"
       when:
         - opm_container_tool_index is defined
-        - opm_container_tool_index != ""
+        - opm_container_tool_index|length > 0
 
     - name: "Trying to export operator '{{ ptq_operator_package_name }}' from index image {{ bundle_index_image }}"
       shell: "{{ opm_bin_path }} index export {{ ptq_index_args }} --package {{ ptq_operator_package_name }} --index {{ bundle_index_image }} --download-folder {{ ptq_download_folder }}"
@@ -52,7 +52,7 @@
     - name: "Quay login via auth token"
       shell: "{{ container_tool }} login -u=\\$oauthtoken -p={{ quay_appregistry_api_token }} quay.io"
       no_log: true
-      when: quay_appregistry_api_token is defined and quay_appregistry_api_token != ""
+      when: quay_appregistry_api_token is defined and quay_appregistry_api_token|length > 0
 
     - name: "Check for the existence of earlier releases of the operator on the quay.io app repository"
       shell: "curl -s -H \"Authorization: basic {{ quay_appregistry_api_token }}\" https://quay.io/cnr/api/v1/packages/{{ ptq_namespace }}/{{ ptq_operator_dir_name }} | {{ jq_bin_path }} '.[].release' | sort --version-sort | tail -n 1"
@@ -79,7 +79,7 @@
         status_code: 201
         return_content: true
       when:
-        - quay_appregistry_api_token != ""
+        - quay_appregistry_api_token|length > 0
         - ptq_dir_existence.status != 200
 
     - name: "Increment quay app release if exists"
@@ -88,7 +88,7 @@
       when:
         - quay_release_result is defined
         - quay_release_result.stdout is defined
-        - quay_release_result.stdout != ""
+        - quay_release_result.stdout|length > 0
         - quay_release_result.stdout != "null"
 
     - name: "Set quay release to the incremented one if exists"

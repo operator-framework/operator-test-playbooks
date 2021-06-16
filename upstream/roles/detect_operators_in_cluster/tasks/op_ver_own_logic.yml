@@ -8,14 +8,15 @@
 - name: "Run only if ocp version found in annotations"
   block:
 
-    - debug:
+    - name: "Prints 'ocp_version_annotation_stdout'"
+      debug:
         var: ocp_version_annotation_stdout
 
     - name: "Backward compatibility, searching (v4.5,v4.6). Please note v4.6,v4.7 will not work."
       when:
-       - ocp_version_annotation_stdout is defined
-       - ocp_version_annotation_stdout != "NotFound"
-       - ocp_version_annotation_stdout.find("v4.5,v4.6") != -1 #found
+        - ocp_version_annotation_stdout is defined
+        - ocp_version_annotation_stdout != "NotFound"
+        - ocp_version_annotation_stdout.find("v4.5,v4.6") != -1 #found
       set_fact:
         ocp_range_start_old: "4.5"
         ovol_appreg_supported: true
@@ -32,28 +33,28 @@
       set_fact:
         ovol_appreg_supported: true
       when:
-          - ocp_version_annotation_stdout is defined
-          - ocp_version_annotation_stdout != "NotFound"
-          - ocp_version_annotation_stdout.find("=") != -1
-          - ocp_version_annotation is defined
-          - ocp_versions is version(dov_cluster_ver, '=')
-          - ocp_version_annotation_stdout.find("v4.5,v4.6") == -1
+        - ocp_version_annotation_stdout is defined
+        - ocp_version_annotation_stdout != "NotFound"
+        - ocp_version_annotation_stdout.find("=") != -1
+        - ocp_version_annotation is defined
+        - ocp_versions is version(dov_cluster_ver, '=')
+        - ocp_version_annotation_stdout.find("v4.5,v4.6") == -1
 
     - name: "Set specific versions if \"-\" detected"
       block:
 
-      - name: "Set start if range or from some version defined"
-        shell: "echo \"{{ ocp_version_annotation_stdout }}\"| awk -F'-' '{print $1}'|awk -F'v' '{print $2}'"
-        register: ocp_range_start
+        - name: "Set start if range or from some version defined"
+          shell: "echo \"{{ ocp_version_annotation_stdout }}\"| awk -F'-' '{print $1}'|awk -F'v' '{print $2}'"
+          register: ocp_range_start
 
-      - name: "Set end when \"-\" detected"
-        shell: "echo \"{{ ocp_version_annotation_stdout }}\"| awk -F'-' '{print $2}'|awk -F'v' '{print $2}'"
-        register: ocp_range_end
+        - name: "Set end when \"-\" detected"
+          shell: "echo \"{{ ocp_version_annotation_stdout }}\"| awk -F'-' '{print $2}'|awk -F'v' '{print $2}'"
+          register: ocp_range_end
 
-      - name: "Add to {{ dov_cluster_ver }} list if cluster in supported range"
-        set_fact:
-          ovol_appreg_supported: true
-        when: "(dov_cluster_ver is version(ocp_range_start.stdout, '>='))  and (dov_cluster_ver is version(ocp_range_end.stdout, '<='))"
+        - name: "Add to {{ dov_cluster_ver }} list if cluster in supported range"
+          set_fact:
+            ovol_appreg_supported: true
+          when: "(dov_cluster_ver is version(ocp_range_start.stdout, '>='))  and (dov_cluster_ver is version(ocp_range_end.stdout, '<='))"
 
       when:
         - ocp_version_annotation_stdout is defined
@@ -86,11 +87,11 @@
       set_fact:
         ovol_appreg_supported: true
       when:
-       - ocp_version_annotation_stdout is defined
-       - ocp_version_annotation_stdout != "NotFound"
-       - ocp_version_annotation_stdout.find("=") == -1
-       - ocp_version_annotation_stdout.find("-") == -1 # '-' not found
-       - dov_cluster_ver is version(ocp_range_start, '>=')
+        - ocp_version_annotation_stdout is defined
+        - ocp_version_annotation_stdout != "NotFound"
+        - ocp_version_annotation_stdout.find("=") == -1
+        - ocp_version_annotation_stdout.find("-") == -1 # '-' not found
+        - dov_cluster_ver is version(ocp_range_start, '>=')
 
   when: (ocp_version_annotation_stdout is defined) and (ocp_version_annotation_stdout != "NotFound")
 

@@ -10,7 +10,7 @@
         name: convert_bundle_image_to_dir
   when:
     - operator_input_image is defined
-    - operator_input_image != ""
+    - operator_input_image|length > 0
 
 - name: "Detect operator format"
   block:
@@ -18,7 +18,7 @@
       fail:
         msg: "Operator version 'op_version' is undefined !!!"
       when:
-        - (op_version is undefined or op_version == "")
+        - (op_version is undefined or op_version|length == 0)
 
     - name: "Search for annotations.yml"
       find:
@@ -91,7 +91,7 @@
             - name: "Fail if any of the required operator annotation(s) are not found"
               fail:
                 msg: "Required operator bundle annotation(s) not found: {{ df_failed_annotations_keys }}"
-              when: df_failed_annotations_keys != ""
+              when: df_failed_annotations_keys|length > 0
 
           when: run_upstream|bool
 
