@@ -18,4 +18,3 @@ skip_list:
   # - yaml  # Violations reported by yamllint
   - line-length
   - comments
-  - braces
