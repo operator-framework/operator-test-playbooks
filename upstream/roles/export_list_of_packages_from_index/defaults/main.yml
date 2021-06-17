@@ -6,3 +6,4 @@ sqlite_db_file: "/tmp/index.db"
 index_pull_skip: false
 index_check: true
 elopfi_filter: ""
+min_operators_in_index_allowed: 0
