@@ -108,8 +108,8 @@
             msg: "Number of missing operators is higher than {{ max_missing_operators_allowed }} - manual check is needed. Index overwrite safety check #2."
           when:
             - max_missing_operators_allowed is defined
-            - max_missing_operators_allowed > 0
-            - chi_uncomplete_packages|length>(max_missing_operators_allowed)
+            - max_missing_operators_allowed|int > 0
+            - chi_uncomplete_packages|length>(max_missing_operators_allowed|int)
 
       when:
         - bundles_namespace is defined

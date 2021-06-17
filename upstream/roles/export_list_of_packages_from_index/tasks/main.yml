@@ -58,8 +58,8 @@
 
       when:
         - min_operators_in_index_allowed is defined
-        - min_operators_in_index_allowed > 0
-        - elopfi_index_packages|length<(min_operators_in_index_allowed)
+        - min_operators_in_index_allowed|int > 0
+        - elopfi_index_packages|length<(min_operators_in_index_allowed|int)
 
   tags:
     - deploy_bundles
