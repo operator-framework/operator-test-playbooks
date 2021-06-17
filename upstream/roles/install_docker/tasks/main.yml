@@ -1,25 +1,45 @@
 ---
 - name: "Docker installaion on ubuntu"
   block:
-    - name: Install aptitude using apt
-      apt: name=aptitude state=present update_cache=yes force_apt_get=yes
+    - name: "Update apt cache"
+      apt: update_cache=yes cache_valid_time=3600
 
-    - name: Install required system packages
-      apt: name={{ item }} state=present update_cache=yes
-      loop: ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+    - name: Upgrade all apt packages
+      apt: upgrade=dist
 
-    - name: "Add Docker GPG apt Key"
+    - name: Install dependencies
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: true
+      vars:
+        packages:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - gnupg-agent
+
+    - name: Add an apt signing key for Docker
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
-    - name: "Add Docker Repository"
+    - name: Add apt repository for stable version
       apt_repository:
-        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
         state: present
 
-    - name: "Update apt and install docker-ce"
-      apt: update_cache=yes name=docker-ce state=present
+    - name: Install Docker
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: true
+      vars:
+        packages:
+          - docker-ce
+          - docker-ce-cli 
+          - containerd.io
   become: true
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
   tags:
