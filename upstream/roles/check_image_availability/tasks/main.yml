@@ -38,11 +38,18 @@
   ignore_errors: true
   when: operator_external_image_raw is defined
 
+- name: "Cat csv '{{ csv_file_path | basename }}' when image not found"
+  shell: "cat {{ csv_file_path }}"
+  register: operator_external_image_raw
+  ignore_errors: true
+  when:
+    - (operator_external_image is not defined) or (operator_external_image|length == 0)
+
 - name: "Print err message if image not found"
   fail:
     msg: "Value of 'metadata.annotations.containerImage' not found, please check."
   when:
-    - operator_external_image is not defined
+    - (operator_external_image is not defined) or (operator_external_image|length == 0)
 
 - name: "Check external image"
   block:
