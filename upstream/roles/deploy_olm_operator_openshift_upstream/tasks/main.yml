@@ -15,20 +15,6 @@
     state: directory
     mode: '0755'
 
-- name: "Set work_dir and upstream settings"
-  set_fact:
-    work_dir: "/tmp/oc-{{ dir_suffix_part }}"
-    run_upstream: true
-
-- name: "Check if deploy is needed"
-  include_role:
-    name: detect_operators_in_cluster
-    tasks_from: op_ver.yml
-
-- name: "Set upstream false"
-  set_fact:
-    run_upstream: false
-
 - name: "Download oc"
   shell: "curl https://mirror.openshift.com/pub/openshift-v4/clients/oc/{{ oc_version_test }}/linux/oc.tar.gz | tar xvzf - -C /tmp/oc-{{ dir_suffix_part }}/bin oc --skip-old-files"
   when:
@@ -61,6 +47,10 @@
   debug:
     var: olm_version_output
 
+- name: "Set work_dir and upstream settings"
+  set_fact:
+    yq_bin_path: "/tmp/oc-{{ dir_suffix_part }}/bin/yq"
+
 - name: "Check that yq exists"
   stat:
     path: "{{ yq_bin_path }}"
@@ -84,6 +74,23 @@
   vars:
     operator_input_image: ""
     op_version: "{{ operator_version }}"
+    run_upstream: true
+
+- name: "Set work_dir and upstream settings"
+  set_fact:
+    work_dir: "/tmp/oc-{{ dir_suffix_part }}"
+#    run_upstream: true
+
+- name: "Check if deploy is needed"
+  include_role:
+    name: detect_operators_in_cluster
+    tasks_from: op_ver.yml
+  vars:
+    run_upstream: true
+
+#- name: "Set upstream false"
+#  set_fact:
+#    run_upstream: false
 
 - name: "Check suggested_namespace"
   include_tasks: get_namespace.yml
@@ -351,7 +358,7 @@
 
 - name: "Output get OperatorGroup"
   copy:
-    content: "{{ dooou_get_pods_result.stdout }}"
+    content: "{{ dooou_get_operatorgroup_result.stdout }}"
     dest: "{{ work_dir }}/dooou_get_operatorgroup_result.txt"
   when: dooou_get_operatorgroup_result.stdout|length > 0
   ignore_errors: true
@@ -599,6 +606,7 @@
   shell: "{{ oc_bin_path }} delete namespace testimagepull"
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
+  ignore_errors: true
 
 - name: "Fail when Operator deployment with OLM failed"
   fail:
