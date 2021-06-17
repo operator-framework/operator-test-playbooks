@@ -358,7 +358,7 @@
 
 - name: "Output get OperatorGroup"
   copy:
-    content: "{{ dooou_get_pods_result.stdout }}"
+    content: "{{ dooou_get_operatorgroup_result.stdout }}"
     dest: "{{ work_dir }}/dooou_get_operatorgroup_result.txt"
   when: dooou_get_operatorgroup_result.stdout|length > 0
   ignore_errors: true
