@@ -599,6 +599,7 @@
   shell: "{{ oc_bin_path }} delete namespace testimagepull"
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
+  ignore_errors: true
 
 - name: "Fail when Operator deployment with OLM failed"
   fail:
