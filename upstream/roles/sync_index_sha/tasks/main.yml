@@ -4,7 +4,6 @@
     name: export_list_of_packages_from_index
   vars:
     bundle_index_image_input: "{{ sis_index_image_output }}"
-    min_operators_in_index_allowed: ""
 
 - name: "Setting list of package"
   set_fact:
@@ -15,12 +14,10 @@
     name: export_list_of_packages_from_index
   vars:
     bundle_index_image_input: "{{ sis_index_image_input }}"
-    min_operators_in_index_allowed: ""
 
 - name: "Setting list of package"
   set_fact:
     input_packages: "{{ elopfi_index_packages }}"
-
 
 - name: "Setting list of package"
   set_fact:

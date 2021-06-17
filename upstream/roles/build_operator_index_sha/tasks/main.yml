@@ -11,7 +11,6 @@
     name: export_list_of_packages_from_index
   vars:
     bundle_index_image_input: "{{ sis_index_image_input }}"
-    min_operators_in_index_allowed: ""
   when: not sis_export_skip|bool
 
 - name: "Filter operator bundles only"
