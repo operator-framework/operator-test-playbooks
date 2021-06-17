@@ -45,7 +45,7 @@
         elopfi_index_packages: "{{ elopfi_index_packages_out.stdout.split(',') }}"
         elopfi_index_bundles: "{{ elopfi_index_bundles_out.stdout.split(',') }}"
 
-    - name: "Check if index has critical amount of operators, less than {{ min_operators_in_index_allowed }}"
+    - name: "Check if index has critical amount of operators, less than 'min_operators_in_index_allowed'"
       block:
 
         - name: "List operators present in index"
