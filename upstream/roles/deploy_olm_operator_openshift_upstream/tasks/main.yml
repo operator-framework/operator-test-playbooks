@@ -47,6 +47,10 @@
   debug:
     var: olm_version_output
 
+- name: "Set work_dir and upstream settings"
+  set_fact:
+    yq_bin_path: "/tmp/oc-{{ dir_suffix_part }}/bin/yq"
+
 - name: "Check that yq exists"
   stat:
     path: "{{ yq_bin_path }}"
