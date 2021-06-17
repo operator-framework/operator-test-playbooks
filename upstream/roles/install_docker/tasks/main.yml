@@ -1,64 +1,54 @@
 ---
-- name: "Docker installaion on ubuntu"
+- name: "Docker installaion"
   block:
-    - name: "Update apt cache"
-      apt: update_cache=yes cache_valid_time=3600
+    - name: "Check if docker is installed"
+      shell: "docker -v"
+      register: docker_version_result
+      failed_when: false
 
-    - name: Upgrade all apt packages
-      apt: upgrade=dist
+    - name: "Docker installaion on ubuntu"
+      block:
+        - name: "Install aptitude using apt"
+          apt: name=aptitude state=present update_cache=yes force_apt_get=yes
 
-    - name: Install dependencies
-      apt:
-        name: "{{ packages }}"
-        state: present
-        update_cache: true
-      vars:
-        packages:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - software-properties-common
-          - gnupg-agent
+        - name: "Add Docker GPG apt Key"
+          apt_key:
+            url: https://download.docker.com/linux/ubuntu/gpg
+            state: present
 
-    - name: Add an apt signing key for Docker
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
+        - name: "Add Docker Repository"
+          apt_repository:
+            repo: deb https://download.docker.com/linux/ubuntu bionic stable
+            state: present
 
-    - name: Add apt repository for stable version
-      apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
-        state: present
+        - name: "Update apt and install docker-ce"
+          apt: update_cache=yes name=docker-ce state=present
+      become: true
+      when:
+        - docker_version_result.rc != 0
+        - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+      tags:
+        - install
+        - host_build
 
-    - name: Install Docker
-      apt:
-        name: "{{ packages }}"
-        state: present
-        update_cache: true
-      vars:
-        packages:
-          - docker-ce
-          - docker-ce-cli 
-          - containerd.io
-  become: true
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-  tags:
-    - install
-    - host_build
+    - name: "Docker installaion on redhat"
+      block:
+        - name: Add Docker CE repository
+          shell: yum-config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+          args:
+            creates: /etc/yum.repos.d/docker-ce.repo
 
-- name: "Docker installaion on redhat"
-  block:
-    - name: Add Docker CE repository
-      shell: yum-config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
-      args:
-        creates: /etc/yum.repos.d/docker-ce.repo
-
-    - name: "Install docker-ce"
-      yum:
-        name: docker-ce
-        state: present
-  become: true
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Fedora'
+        - name: "Install docker-ce"
+          yum:
+            name: docker-ce
+            state: present
+      become: true
+      when:
+        - docker_version_result.rc != 0
+        - ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Fedora'
+      tags:
+        - install
+        - host_build
   tags:
     - install
     - host_build
