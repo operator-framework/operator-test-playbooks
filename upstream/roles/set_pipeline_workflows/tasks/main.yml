@@ -1,0 +1,13 @@
+---
+#ANSIBLE_STDOUT_CALLBACK=yaml ansible-playbook -i localhost, set-pipeline-workflow.yml -e ansible_connection=local -e workflow_templates_path=~/projects/RH/community-operators/scripts/template/workflow/ -e workflow_config_path=~/projects/RH/community-operators/ -vv
+- name: "Load the pipeline config"
+  include_vars:
+    file: "{{ workflow_config_path }}/pipeline-config.yaml"
+
+- name: "Copy operator test file"
+  template:
+    src: "{{ workflow_templates_path }}/operator_test.yaml.js2"
+    dest: "{{ workflow_files_path }}/operator_test.yaml"
+
+- name: "debug"
+  shell: "head {{ workflow_files_path }}/operator_test.yaml"
