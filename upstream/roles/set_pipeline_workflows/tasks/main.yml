@@ -2,12 +2,24 @@
 #ANSIBLE_STDOUT_CALLBACK=yaml ansible-playbook -i localhost, set-pipeline-workflow.yml -e ansible_connection=local -e workflow_templates_path=~/projects/RH/community-operators/scripts/template/workflow/ -e workflow_config_path=~/projects/RH/community-operators/ -vv
 - name: "Load the pipeline config"
   include_vars:
-    file: "{{ workflow_config_path }}/pipeline-config.yaml"
+    file: "{{ workflow_config_path }}/pipeline-config-default.yaml"
+    name: default_config
+
+- name: "Find template files"
+  find:
+    paths: "{{ workflow_templates_path }}/"
+    file_type: file
+    recurse: false
+    patterns: "*.js2"
+  register: template_files
 
 - name: "Copy operator test file"
   template:
-    src: "{{ workflow_templates_path }}/operator_test.yaml.js2"
-    dest: "{{ workflow_files_path }}/operator_test.yaml"
+    src: "{{ item.path }}"
+    dest: '{{ workflow_files_path }}/{{ item.path.split("/")[-1].split(".js2")[0] }}'
+  loop: "{{ template_files.files|flatten(levels=1) }}"
+  loop_control:
+    label: "{{ item.path }}"
 
-- name: "debug"
-  shell: "head {{ workflow_files_path }}/operator_test.yaml"
+- debug:
+    msg: "{{ default_config.production.index.tags|join(', ') }}"
