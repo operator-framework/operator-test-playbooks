@@ -19,6 +19,3 @@
   loop: "{{ template_files.files|flatten(levels=1) }}"
   loop_control:
     label: "{{ item.path }}"
-
-- debug:
-    msg: "{{ default_config.production.index.tags|join(', ') }}"
